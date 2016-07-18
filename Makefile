@@ -25,7 +25,10 @@ ERL_CFLAGS ?= -I$(ERL_EI_INCLUDE_DIR)
 ERL_LDFLAGS ?= -L$(ERL_EI_LIBDIR) -lei
 
 LDFLAGS +=
-# CFLAGS += -DDEBUG
+CFLAGS += -std=gnu99
+
+# Enable for debug messages
+#CFLAGS += -DDEBUG
 
 CC ?= $(CROSSCOMPILER)gcc
 
