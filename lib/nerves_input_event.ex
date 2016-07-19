@@ -53,7 +53,6 @@ defmodule Nerves.InputEvent do
       case decode(type, code, value) do
         {:ev_syn, :syn_report, 0} ->
           if state.callback do
-            IO.inspect(Enum.reverse(state.buffer))
             send state.callback,  {:nerves_input_event, state.name, Enum.reverse(state.buffer)}
           end
           %{state | buffer: []}
