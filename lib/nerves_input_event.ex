@@ -48,6 +48,12 @@ defmodule Nerves.InputEvent do
     handle_port(msg, state)
   end
 
+  def handle_info({_, {:data, <<?e, message::binary>>}}, state) do
+    error = :erlang.binary_to_term(message)
+    send state.callback,  {:nerves_input_event, state.name, error}
+    {:stop, error, state}
+  end
+
   defp handle_port({:event, type, code, value}, state) do
     state =
       case decode(type, code, value) do

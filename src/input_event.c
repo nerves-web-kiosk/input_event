@@ -38,6 +38,7 @@
 #include "erlcmd.h"
 
 static const char notification_id = 'n';
+static const char error_id = 'e';
 
 void device_handle_request(const char *req, void *cookie) {
   debug("Erl sent data");
@@ -46,7 +47,7 @@ void device_handle_request(const char *req, void *cookie) {
 void device_process(int fd) {
   struct input_event ev[64];
   int i, rd;
-
+  debug("Read");
   rd = read(fd, ev, sizeof(struct input_event) * 64);
   if (rd < (int) sizeof(struct input_event)) {
 		printf("expected %d bytes, got %d\n", (int) sizeof(struct input_event), rd);
@@ -76,6 +77,19 @@ void device_process(int fd) {
   }
 }
 
+void device_closed(int fd) {
+  char resp[sizeof(struct input_event) * 64];
+  int resp_index = sizeof(uint16_t); // Space for payload size
+
+  resp[resp_index++] = error_id;
+
+  ei_encode_version(resp, &resp_index);
+  ei_encode_tuple_header(resp, &resp_index, 2);
+  ei_encode_atom(resp, &resp_index, "error");
+  ei_encode_atom(resp, &resp_index, "closed");
+  erlcmd_send(resp, resp_index);
+}
+
 static int open_device(char *dev) {
   int version, fd;
 
@@ -100,7 +114,7 @@ static int open_device(char *dev) {
     fdset[0].revents = 0;
 
     fdset[1].fd = fd;
-    fdset[1].events = (POLLIN | POLLPRI);
+    fdset[1].events = (POLLIN | POLLPRI | POLLHUP);
     fdset[1].revents = 0;
 
     int timeout = -1; // Wait forever unless told by otherwise
@@ -111,7 +125,12 @@ static int open_device(char *dev) {
 
     if (fdset[1].revents & POLLIN)
       device_process(fd);
+
+    if (fdset[1].revents & POLLHUP)
+      device_closed(fd);
+      break;
   }
+  debug("Exit");
   return 0;
 }
 
