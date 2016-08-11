@@ -126,9 +126,10 @@ static int open_device(char *dev) {
     if (fdset[1].revents & POLLIN)
       device_process(fd);
 
-    if (fdset[1].revents & POLLHUP)
+    if (fdset[1].revents & POLLHUP) {
       device_closed(fd);
       break;
+    }
   }
   debug("Exit");
   return 0;
