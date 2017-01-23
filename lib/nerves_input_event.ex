@@ -3,7 +3,7 @@ defmodule Nerves.InputEvent do
   import Nerves.InputEvent.Decoder
 
   def start_link(fd) do
-    GenServer.start_link(__MODULE__, [fd, self])
+    GenServer.start_link(__MODULE__, [fd, self()])
   end
 
   @doc """
