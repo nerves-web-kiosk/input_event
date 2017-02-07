@@ -747,7 +747,8 @@ defmodule Nerves.InputEvent.Decoder do
     ev_msc: @msc_events,
     ev_led: @led_events,
     ev_rep: @rep_events,
-    ev_snd: @snd_events
+    ev_snd: @snd_events,
+    ev_sw: @sw_events
   ]
 
   def decode(type, code, value) do
