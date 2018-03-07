@@ -1,34 +1,44 @@
-defmodule Nerves.InputEvent.Mixfile do
+defmodule InputEvent.Mixfile do
   use Mix.Project
 
+  @app :input_event
+
   def project do
-    [app: :nerves_input_event,
-     version: "0.1.0",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     make_clean: ["clean"],
-     compilers: [:elixir_make | Mix.compilers],
-     deps: deps()]
+    [
+      app: @app,
+      version: "0.2.0",
+      elixir: "~> 1.3",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      description: description(),
+      package: package(),
+      make_clean: ["clean"],
+      compilers: [:elixir_make | Mix.compilers()],
+      deps: deps(),
+      docs: [extras: ["README.md"], main: "readme"]
+    ]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
   def application do
     [applications: []]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
   defp deps do
-    [{:elixir_make, "~> 0.3"}]
+    [
+      {:elixir_make, "~> 0.3"},
+      {:ex_doc, "~> 0.18", only: :dev}
+    ]
+  end
+
+  defp description do
+    "Elixir interface to Linux input event devices"
+  end
+
+  defp package do
+    [
+      maintainers: ["Justin Schneck"],
+      licenses: ["Apache 2.0"],
+      links: %{"Github" => "https://github.com/letoteteam/#{@app}"}
+    ]
   end
 end

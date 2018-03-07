@@ -1,24 +1,73 @@
-# NervesInputEvent
+# InputEvent
 
-**TODO: Add description**
+Elixir interface to Linux input event devices
 
-## Installation
+## Usage
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+InputEvent can be used to monitor `/dev/input/event*` devices and report decoded data to
+the parent process.
 
-  1. Add `nerves_input_event` to your list of dependencies in `mix.exs`:
+Start by looking for the device you want to monitor.
 
-    ```elixir
-    def deps do
-      [{:nerves_input_event, "~> 0.1.0"}]
-    end
-    ```
+```elixir
+iex> InputEvent.enumerate
+[
+  {"/dev/input/event9", "Intel Virtual Button driver"},
+  {"/dev/input/event8", "Intel HID 5 button array"},
+  {"/dev/input/event7", "Intel HID events"},
+  {"/dev/input/event6", "SynPS/2 Synaptics TouchPad"},
+  {"/dev/input/event5", "Video Bus"},
+  {"/dev/input/event4", "AT Translated Set 2 keyboard"},
+  {"/dev/input/event3", "Power Button"},
+  {"/dev/input/event2", "Sleep Button"},
+  {"/dev/input/event19", "HDA Intel PCH HDMI/DP,pcm=10"},
+  {"/dev/input/event18", "HDA Intel PCH HDMI/DP,pcm=9"},
+  {"/dev/input/event17", "HDA Intel PCH HDMI/DP,pcm=8"},
+  {"/dev/input/event16", "HDA Intel PCH HDMI/DP,pcm=7"},
+  {"/dev/input/event15", "HDA Intel PCH HDMI/DP,pcm=3"},
+  {"/dev/input/event14", "HDA Intel PCH Headphone Mic"},
+  {"/dev/input/event13", "DLL082A:01 06CB:76AF Touchpad"},
+  {"/dev/input/event12", "Integrated_Webcam_HD: Integrate"},
+  {"/dev/input/event11", "ELAN Touchscreen"},
+  {"/dev/input/event10", "Dell WMI hotkeys"},
+  {"/dev/input/event1", "Power Button"},
+  {"/dev/input/event0", "Lid Switch"}
+]
+```
 
-  2. Ensure `nerves_input_event` is started before your application:
+Here we have a touch screen at `/dev/input/event11`, lets open it.
 
-    ```elixir
-    def application do
-      [applications: [:nerves_input_event]]
-    end
-    ```
+```elixir
+iex> InputEvent.start_link "/dev/input/event11"
+{:ok, #PID<0.197.0>}
+```
 
+Lets touch the screen to test
+
+```elixir
+iex> flush
+{:input_event, "/dev/input/event11",
+ [
+   {:ev_abs, :abs_mt_tracking_id, 1},
+   {:ev_abs, :abs_mt_position_x, 2630},
+   {:ev_abs, :abs_mt_position_y, 1141},
+   {:ev_abs, :abs_mt_tool_x, 2630},
+   {:ev_abs, :abs_mt_tool_y, 1141},
+   {:ev_abs, :abs_mt_touch_major, 7},
+   {:ev_abs, :abs_mt_touch_minor, 4},
+   {:ev_key, :btn_touch, 1},
+   {:ev_abs, :abs_x, 2630},
+   {:ev_abs, :abs_y, 1141}
+ ]}
+{:input_event, "/dev/input/event11",
+ [{:ev_abs, :abs_mt_touch_major, 8}, {:ev_abs, :abs_mt_touch_minor, 5}]}
+{:input_event, "/dev/input/event11", [{:ev_abs, :abs_mt_touch_major, 9}]}
+{:input_event, "/dev/input/event11", [{:ev_abs, :abs_mt_touch_major, 8}]}
+{:input_event, "/dev/input/event11",
+ [{:ev_abs, :abs_mt_touch_major, 7}, {:ev_abs, :abs_mt_touch_minor, 4}]}
+{:input_event, "/dev/input/event11",
+ [{:ev_abs, :abs_mt_touch_major, 5}, {:ev_abs, :abs_mt_touch_minor, 3}]}
+{:input_event, "/dev/input/event11",
+ [{:ev_abs, :abs_mt_tracking_id, -1}, {:ev_key, :btn_touch, 0}]}
+:ok
+```
