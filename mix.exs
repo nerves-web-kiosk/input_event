@@ -25,8 +25,8 @@ defmodule InputEvent.Mixfile do
 
   defp deps do
     [
-      {:elixir_make, "~> 0.3"},
-      {:ex_doc, "~> 0.18", only: :dev}
+      {:elixir_make, "~> 0.4", runtime: false},
+      {:ex_doc, "~> 0.18", only: [:dev, :test], runtime: false}
     ]
   end
 
