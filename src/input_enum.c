@@ -121,7 +121,7 @@ struct device_info *find_input_devices() {
 		char name[256] = "???";
 
 		snprintf(fname, sizeof(fname),
-			 "%s/%s", DEV_INPUT_EVENT, namelist[i]->d_name);
+			 DEV_INPUT_EVENT "/%.32s", namelist[i]->d_name);
 		fd = open(fname, O_RDONLY);
 		if (fd < 0)
 			continue;
