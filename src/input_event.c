@@ -90,7 +90,7 @@ void device_closed(int fd) {
   erlcmd_send(resp, resp_index);
 }
 
-static int open_device(char *dev) {
+static int open_device(const char *dev) {
   int version, fd;
 
   fd = open(dev, O_RDONLY);
@@ -100,7 +100,7 @@ static int open_device(char *dev) {
   if (ioctl(fd, EVIOCGVERSION, &version))
 		err(EXIT_FAILURE, "can't get version");
 
-  printf("Input driver version is %d.%d.%d\n",
+  debug("Input driver version is %d.%d.%d\n",
 		version >> 16, (version >> 8) & 0xff, version & 0xff);
 
   struct erlcmd handler;
@@ -136,8 +136,11 @@ static int open_device(char *dev) {
 }
 
 int main(int argc, char *argv[]) {
-  if (argc == 2 && strcmp(argv[1], "enumerate") == 0)
+  if (argc != 2)
+    errx(EXIT_FAILURE, "Expecting path or 'enumerate'");
+
+  if (strcmp(argv[1], "enumerate") == 0)
     return enum_devices();
   else
-    return open_device(strdup(argv[argc - 1]));
+    return open_device(argv[1]);
 }
