@@ -8,10 +8,6 @@
 # LDFLAGS	linker flags for linking all binaries
 # ERL_LDFLAGS	additional linker flags for projects referencing Erlang libraries
 
-# Look for the EI library and header files
-# For crosscompiled builds, ERL_EI_INCLUDE_DIR and ERL_EI_LIBDIR must be
-# passed into the Makefile.
-
 # Check that we're on a supported build platform
 ifeq ($(CROSSCOMPILE),)
     # Not crosscompiling, so check that we're on Linux.
@@ -28,13 +24,14 @@ endif
 
 DEFAULT_TARGETS ?= priv priv/input_event
 
+# The paths to the EI library and header files are either passed in when
+# compiled by Nerves (crosscompiled builds) or determined by mix.exs for
+# host builds.
 ifeq ($(ERL_EI_INCLUDE_DIR),)
-ERL_ROOT_DIR = $(shell erl -eval "io:format(\"~s~n\", [code:root_dir()])" -s init stop -noshell)
-ifeq ($(ERL_ROOT_DIR),)
-   $(error Could not find the Erlang installation. Check to see that 'erl' is in your PATH)
+$(error ERL_EI_INCLUDE_DIR not set. Invoke via mix)
 endif
-ERL_EI_INCLUDE_DIR = "$(ERL_ROOT_DIR)/usr/include"
-ERL_EI_LIBDIR = "$(ERL_ROOT_DIR)/usr/lib"
+ifeq ($(ERL_EI_LIBDIR),)
+$(error ERL_EI_LIBDIR not set. Invoke via mix)
 endif
 
 # Set Erlang-specific compile and linker flags
