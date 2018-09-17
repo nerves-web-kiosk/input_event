@@ -50,8 +50,7 @@ void device_process(int fd) {
   debug("Read");
   rd = read(fd, ev, sizeof(struct input_event) * 64);
   if (rd < (int) sizeof(struct input_event)) {
-		printf("expected %d bytes, got %d\n", (int) sizeof(struct input_event), rd);
-		perror("\nevtest: error reading");
+		warn("error from read - expected %d bytes, got %d", (int) sizeof(struct input_event), rd);
 		return;
 	}
 

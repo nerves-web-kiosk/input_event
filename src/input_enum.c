@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <inttypes.h>
+#include <err.h>
 
 #include "utils.h"
 #include "erlcmd.h"
@@ -74,7 +75,7 @@ static int is_event_device(const struct dirent *dir) {
 
 int enum_devices() {
   if (getuid() != 0)
-	  fprintf(stderr, "Not running as root, no devices may be available.\n");
+	  warnx("Not running as root, no devices may be available.");
 
   struct device_info *device_list = find_input_devices();
   int device_list_len = 0;
