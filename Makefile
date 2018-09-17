@@ -68,7 +68,7 @@ priv:
 
 priv/input_event: $(OBJ)
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
-	# setuid root uevent so that it can interact with the netlink
+	# For host builds, setuid root the input_event binary so that it can read /dev/input/event*
 	SUDO_ASKPASS=$(SUDO_ASKPASS) $(SUDO) -- sh -c 'chown root:root $@; chmod +s $@'
 
 clean:
