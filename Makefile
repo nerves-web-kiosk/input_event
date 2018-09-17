@@ -61,7 +61,7 @@ OBJ=$(SRC:.c=.o)
 
 .PHONY: all clean
 
-all: priv/input_event
+all: priv priv/input_event
 
 %.o: %.c
 	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
