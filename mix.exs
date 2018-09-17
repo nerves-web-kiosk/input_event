@@ -13,6 +13,7 @@ defmodule InputEvent.Mixfile do
       description: description(),
       package: package(),
       make_clean: ["clean"],
+      make_env: make_env(),
       compilers: [:elixir_make | Mix.compilers()],
       deps: deps(),
       docs: [extras: ["README.md"], main: "readme"]
@@ -40,5 +41,18 @@ defmodule InputEvent.Mixfile do
       licenses: ["Apache 2.0"],
       links: %{"Github" => "https://github.com/letoteteam/#{@app}"}
     ]
+  end
+
+  defp make_env() do
+    case System.get_env("ERL_EI_INCLUDE_DIR") do
+      nil ->
+        %{
+          "ERL_EI_INCLUDE_DIR" => "#{:code.root_dir()}/usr/include",
+          "ERL_EI_LIBDIR" => "#{:code.root_dir()}/usr/lib"
+        }
+
+      _ ->
+        %{}
+    end
   end
 end
