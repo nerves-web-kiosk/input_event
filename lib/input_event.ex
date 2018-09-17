@@ -7,7 +7,7 @@ defmodule InputEvent do
   end
 
   @doc """
-  Stop the UART GenServer.
+  Stop the InputEvent GenServer.
   """
   def stop(pid) do
     GenServer.stop(pid)
