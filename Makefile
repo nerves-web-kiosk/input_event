@@ -56,8 +56,6 @@ endif
 # Enable for debug messages
 #CFLAGS += -DDEBUG
 
-CC ?= $(CROSSCOMPILER)gcc
-
 SRC=$(wildcard src/*.c)
 OBJ=$(SRC:.c=.o)
 
