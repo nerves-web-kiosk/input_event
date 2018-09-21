@@ -6,7 +6,7 @@ defmodule InputEvent.Mixfile do
   def project do
     [
       app: @app,
-      version: "0.2.0",
+      version: "0.3.0",
       elixir: "~> 1.3",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,

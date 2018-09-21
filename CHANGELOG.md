@@ -1,5 +1,10 @@
 # InputEvent
 
+## v0.3.0
+
+* Enhancements
+  * Clean up dependencies and various formatting bug fixes.
+
 ## v0.2.0
 
 * Enhancements
