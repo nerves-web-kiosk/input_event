@@ -1,5 +1,7 @@
 # InputEvent
 
+[![Hex version](https://img.shields.io/hexpm/v/input_event.svg "Hex version")](https://hex.pm/packages/input_event)
+
 Elixir interface to Linux input event devices
 
 ## Usage
