@@ -37,9 +37,19 @@ defmodule InputEvent.Mixfile do
 
   defp package do
     [
+      files: [
+        "lib",
+        "src/*.[ch]",
+        "test",
+        "mix.exs",
+        "README.md",
+        "LICENSE",
+        "CHANGELOG.md",
+        "Makefile"
+      ],
       maintainers: ["Justin Schneck"],
-      licenses: ["Apache 2.0"],
-      links: %{"Github" => "https://github.com/letoteteam/#{@app}"}
+      licenses: ["Apache-2.0"],
+      links: %{"GitHub" => "https://github.com/letoteteam/#{@app}"}
     ]
   end
 
