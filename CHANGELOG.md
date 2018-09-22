@@ -1,5 +1,11 @@
 # InputEvent
 
+## v0.3.1
+
+* Bug fixes
+  * Update hex package files list.
+  * Update gitignore.
+
 ## v0.3.0
 
 * Enhancements
