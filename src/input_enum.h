@@ -27,11 +27,11 @@ struct device_info {
     struct device_info *next;
 };
 
-struct device_info *device_info_alloc();
+struct device_info *device_info_alloc(void);
 void device_info_free(struct device_info *info);
 void device_info_free_list(struct device_info *info);
 
 int enum_devices(void);
-struct device_info *find_input_devices();
+struct device_info *find_input_devices(void);
 
 #endif

@@ -31,115 +31,95 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include <sys/inotify.h>
+#include <sys/uio.h>
+
 #include <poll.h>
 
 #include "utils.h"
 #include "input_enum.h"
-#include "erlcmd.h"
 
-static const char notification_id = 'n';
-static const char error_id = 'e';
+#define INPUT_EVENT_EVENT 1
+#define INPUT_EVENT_CLOSED 2
+#define INPUT_EVENT_REENUMERATE 3
+#define INPUT_EVENT_INOTIFY 4
 
-void device_handle_request(const char *req, void *cookie) {
-  debug("Erl sent data");
-}
+#define MAX_EVENTS_PER_READ 64
+static struct input_event input_buffer[MAX_EVENTS_PER_READ];
+static char report_buffer[MAX_EVENTS_PER_READ * 8 + 4];
 
-void device_process(int fd) {
-  struct input_event ev[64];
-  int i, rd;
-  debug("Read");
-  rd = read(fd, ev, sizeof(struct input_event) * 64);
-  if (rd < (int) sizeof(struct input_event)) {
-		warn("error from read - expected %d bytes, got %d", (int) sizeof(struct input_event), rd);
-		return;
-	}
+static void device_process(int fd)
+{
+    // Read as many the input events as possible
+    ssize_t rd = read(fd, input_buffer, sizeof(input_buffer));
+    if (rd < 0)
+        err(EXIT_FAILURE, "read failed");
+    if (rd % sizeof(struct input_event))
+        errx(EXIT_FAILURE, "read returned %d which is not a multiple of %d!", (int) rd, (int) sizeof(struct input_event));
 
-  for (i = 0; i < rd / sizeof(struct input_event); i++) {
+    // Package them for processing in Elixir.
+    // The event timestamps have platform-dependent sizes (it's a timeval), so
+    // strip them off. The rest of the event struct is well-defined.
 
-    char resp[sizeof(struct input_event) * 64];
-    int resp_index = sizeof(uint16_t); // Space for payload size
+    int event_count = rd / sizeof(struct input_event);
+    int report_len = event_count * 8 + 2; // Don't count the size field in the header
 
-    debug("New event");
-    debug("Type: %d", ev[i].type);
-    debug("Code: %d", ev[i].code);
-    debug("Value: %d", ev[i].value);
+    // Fill out the header
+    report_buffer[0] = (report_len >> 8);
+    report_buffer[1] = (report_len & 0xff);
+    report_buffer[2] = INPUT_EVENT_EVENT;
+    report_buffer[3] = 0;
 
-    resp[resp_index++] = notification_id;
-    ei_encode_version(resp, &resp_index);
-    ei_encode_tuple_header(resp, &resp_index, 4);
-    ei_encode_atom(resp, &resp_index, "event");
-
-    ei_encode_long(resp, &resp_index, ev[i].type);
-    ei_encode_long(resp, &resp_index, ev[i].code);
-    ei_encode_long(resp, &resp_index, ev[i].value);
-    erlcmd_send(resp, resp_index);
-  }
-}
-
-void device_closed(int fd) {
-  char resp[sizeof(struct input_event) * 64];
-  int resp_index = sizeof(uint16_t); // Space for payload size
-
-  resp[resp_index++] = error_id;
-
-  ei_encode_version(resp, &resp_index);
-  ei_encode_tuple_header(resp, &resp_index, 2);
-  ei_encode_atom(resp, &resp_index, "error");
-  ei_encode_atom(resp, &resp_index, "closed");
-  erlcmd_send(resp, resp_index);
-}
-
-static int open_device(const char *dev) {
-  int version, fd;
-
-  fd = open(dev, O_RDONLY);
-  if (errno == EACCES && getuid() != 0)
-    err(EXIT_FAILURE, "You do not have access to %s.", dev);
-
-  if (ioctl(fd, EVIOCGVERSION, &version))
-		err(EXIT_FAILURE, "can't get version");
-
-  debug("Input driver version is %d.%d.%d\n",
-		version >> 16, (version >> 8) & 0xff, version & 0xff);
-
-  struct erlcmd handler;
-  erlcmd_init(&handler, device_handle_request, &fd);
-
-  for (;;) {
-    struct pollfd fdset[2];
-
-    fdset[0].fd = STDIN_FILENO;
-    fdset[0].events = POLLIN;
-    fdset[0].revents = 0;
-
-    fdset[1].fd = fd;
-    fdset[1].events = (POLLIN | POLLPRI | POLLHUP);
-    fdset[1].revents = 0;
-
-    int timeout = -1; // Wait forever unless told by otherwise
-    int rc = poll(fdset, 2, timeout);
-
-    if (fdset[0].revents & (POLLIN | POLLHUP))
-      erlcmd_process(&handler);
-
-    if (fdset[1].revents & POLLIN)
-      device_process(fd);
-
-    if (fdset[1].revents & POLLHUP) {
-      device_closed(fd);
-      break;
+    char *p = &report_buffer[4];
+    for (int i = 0; i < event_count; i++) {
+        memcpy(p, &input_buffer[i].type, 8);
+        p += 8;
     }
-  }
-  debug("Exit");
-  return 0;
+
+    if (write(STDOUT_FILENO, report_buffer, report_len + 2) < 0)
+        err(EXIT_FAILURE, "writev failed");
 }
 
-int main(int argc, char *argv[]) {
-  if (argc != 2)
-    errx(EXIT_FAILURE, "Expecting path or 'enumerate'");
+int main(int argc, char *argv[])
+{
+    if (argc != 2)
+        errx(EXIT_FAILURE, "Pass the device to monitor");
 
-  if (strcmp(argv[1], "enumerate") == 0)
-    return enum_devices();
-  else
-    return open_device(argv[1]);
+    const char *input_path = argv[1];
+    int fd = open(input_path, O_RDONLY);
+    if (errno == EACCES && getuid() != 0)
+        err(EXIT_FAILURE, "You do not have access to %s.", input_path);
+
+    int version;
+    if (ioctl(fd, EVIOCGVERSION, &version))
+        err(EXIT_FAILURE, "can't get version");
+
+    debug("Input driver version is %d.%d.%d\n",
+          version >> 16, (version >> 8) & 0xff, version & 0xff);
+
+    for (;;) {
+        struct pollfd fdset[2];
+
+        fdset[0].fd = STDIN_FILENO;
+        fdset[0].events = POLLIN;
+        fdset[0].revents = 0;
+
+        fdset[1].fd = fd;
+        fdset[1].events = (POLLIN | POLLPRI | POLLHUP);
+        fdset[1].revents = 0;
+
+        int rc = poll(fdset, 2, -1);
+        if (rc < 0)
+            err(EXIT_FAILURE, "poll");
+
+        if (fdset[1].revents & (POLLIN | POLLHUP))
+            device_process(fd);
+
+        // Check for Elixir going away
+        if (fdset[0].revents & (POLLIN | POLLHUP)) {
+            warnx("Got input from Elixir? 0x%08x", fdset[0].revents);
+            break;
+        }
+    }
 }
