@@ -37,9 +37,9 @@ defmodule InputEventTest do
     assert Decoder.decode(1, 10, 0) == {:ev_key, :key_9, 0}
   end
 
-  #test "decode unknown type" do
-  #  assert Decoder.decode_type(0x50) == nil
-  #end
+  test "decode unknown type" do
+    assert Decoder.decode_type(0x50) == 0x50
+  end
 
   test "decode unknown code" do
     assert Decoder.decode_code(:bogus, 100) == 100
