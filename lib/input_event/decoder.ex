@@ -11,18 +11,14 @@ defmodule InputEvent.Decoder do
     ev_rep: 0x14,
     ev_ff: 0x15,
     ev_pwr: 0x16,
-    ev_ff_status: 0x17,
-    ev_max: 0x1F,
-    ev_cnt: 0x1F + 1
+    ev_ff_status: 0x17
   ]
 
   @syn_events [
     syn_report: 0,
     syn_config: 1,
     syn_mt_report: 2,
-    syn_dropped: 3,
-    syn_max: 0xF,
-    syn_cnt: 0xF + 1
+    syn_dropped: 3
   ]
   @key_events [
     key_reserved: 0,
@@ -176,9 +172,9 @@ defmodule InputEvent.Decoder do
     key_prog2: 149,
     key_www: 150,
     key_msdos: 151,
-    key_coffee: 152,
+    # key_coffee: 152,
     key_screenlock: 152,
-    key_rotate_display: 153,
+    # key_rotate_display: 153,
     key_direction: 153,
     key_cyclewindows: 154,
     key_mail: 155,
@@ -266,13 +262,13 @@ defmodule InputEvent.Decoder do
     key_video_prev: 242,
     key_brightness_cycle: 243,
     key_brightness_auto: 244,
-    key_brightness_zero: 244,
+    # key_brightness_zero: 244,
     key_display_off: 245,
     key_wwan: 246,
-    key_wimax: 246,
+    # key_wimax: 246,
     key_rfkill: 247,
     key_micmute: 248,
-    btn_misc: 0x100,
+    # btn_misc: 0x100,
     btn_0: 0x100,
     btn_1: 0x101,
     btn_2: 0x102,
@@ -283,7 +279,7 @@ defmodule InputEvent.Decoder do
     btn_7: 0x107,
     btn_8: 0x108,
     btn_9: 0x109,
-    btn_mouse: 0x110,
+    # btn_mouse: 0x110,
     btn_left: 0x110,
     btn_right: 0x111,
     btn_middle: 0x112,
@@ -292,7 +288,7 @@ defmodule InputEvent.Decoder do
     btn_forward: 0x115,
     btn_back: 0x116,
     btn_task: 0x117,
-    btn_joystick: 0x120,
+    # btn_joystick: 0x120,
     btn_trigger: 0x120,
     btn_thumb: 0x121,
     btn_thumb2: 0x122,
@@ -306,15 +302,15 @@ defmodule InputEvent.Decoder do
     btn_base5: 0x12A,
     btn_base6: 0x12B,
     btn_dead: 0x12F,
-    btn_gamepad: 0x130,
-    btn_south: 0x130,
+    # btn_gamepad: 0x130,
+    # btn_south: 0x130,
     btn_a: 0x130,
-    btn_east: 0x131,
+    # btn_east: 0x131,
     btn_b: 0x131,
     btn_c: 0x132,
-    btn_north: 0x133,
+    # btn_north: 0x133,
     btn_x: 0x133,
-    btn_west: 0x134,
+    # btn_west: 0x134,
     btn_y: 0x134,
     btn_z: 0x135,
     btn_tl: 0x136,
@@ -326,7 +322,7 @@ defmodule InputEvent.Decoder do
     btn_mode: 0x13C,
     btn_thumbl: 0x13D,
     btn_thumbr: 0x13E,
-    btn_digi: 0x140,
+    # btn_digi: 0x140,
     btn_tool_pen: 0x140,
     btn_tool_rubber: 0x141,
     btn_tool_brush: 0x142,
@@ -343,7 +339,7 @@ defmodule InputEvent.Decoder do
     btn_tool_tripletap: 0x14E,
     btn_tool_quadtap: 0x14F,
     btn_wheel: 0x150,
-    btn_gear_down: 0x150,
+    # btn_gear_down: 0x150,
     btn_gear_up: 0x151,
     key_ok: 0x160,
     key_select: 0x161,
@@ -424,7 +420,7 @@ defmodule InputEvent.Decoder do
     key_voicemail: 0x1AC,
     key_addressbook: 0x1AD,
     key_messenger: 0x1AE,
-    key_displaytoggle: 0x1AF,
+    # key_displaytoggle: 0x1AF,
     key_brightness_toggle: 0x1AF,
     key_spellcheck: 0x1B0,
     key_logoff: 0x1B1,
@@ -540,8 +536,8 @@ defmodule InputEvent.Decoder do
     key_unmute: 0x274,
     key_fastreverse: 0x275,
     key_slowreverse: 0x276,
-    key_data: 0x275,
-    btn_trigger_happy: 0x2C0,
+    # key_data: 0x275,
+    # btn_trigger_happy: 0x2C0,
     btn_trigger_happy1: 0x2C0,
     btn_trigger_happy2: 0x2C1,
     btn_trigger_happy3: 0x2C2,
@@ -581,10 +577,7 @@ defmodule InputEvent.Decoder do
     btn_trigger_happy37: 0x2E4,
     btn_trigger_happy38: 0x2E5,
     btn_trigger_happy39: 0x2E6,
-    btn_trigger_happy40: 0x2E7,
-    key_min_interesting: 113,
-    key_max: 0x2FF,
-    key_cnt: 0x2FF + 1
+    btn_trigger_happy40: 0x2E7
   ]
 
   @abs_events [
@@ -628,9 +621,7 @@ defmodule InputEvent.Decoder do
     abs_mt_pressure: 0x3A,
     abs_mt_distance: 0x3B,
     abs_mt_tool_x: 0x3C,
-    abs_mt_tool_y: 0x3D,
-    abs_max: 0x3F,
-    abs_cnt: 0x3F + 1
+    abs_mt_tool_y: 0x3D
   ]
 
   @sw_events [
@@ -638,7 +629,7 @@ defmodule InputEvent.Decoder do
     sw_tablet_mode: 0x01,
     sw_headphone_insert: 0x02,
     sw_rfkill_all: 0x03,
-    sw_radio: 0x03,
+    # sw_radio: 0x03,
     sw_microphone_insert: 0x04,
     sw_dock: 0x05,
     sw_lineout_insert: 0x06,
@@ -649,9 +640,7 @@ defmodule InputEvent.Decoder do
     sw_front_proximity: 0x0B,
     sw_rotate_lock: 0x0C,
     sw_linein_insert: 0x0D,
-    sw_mute_device: 0x0E,
-    sw_max: 0x0F,
-    sw_cnt: 0x0F + 1
+    sw_mute_device: 0x0E
   ]
 
   @msc_events [
@@ -660,9 +649,7 @@ defmodule InputEvent.Decoder do
     msc_gesture: 0x02,
     msc_raw: 0x03,
     msc_scan: 0x04,
-    msc_timestamp: 0x05,
-    msc_max: 0x07,
-    msc_cnt: 0x07 + 1
+    msc_timestamp: 0x05
   ]
 
   @led_events [
@@ -676,24 +663,18 @@ defmodule InputEvent.Decoder do
     led_mute: 0x07,
     led_misc: 0x08,
     led_mail: 0x09,
-    led_charging: 0x0A,
-    led_max: 0x0F,
-    led_cnt: 0x0F + 1
+    led_charging: 0x0A
   ]
 
   @rep_events [
     rep_delay: 0x00,
-    rep_period: 0x01,
-    rep_max: 0x01,
-    rep_cnt: 0x01 + 1
+    rep_period: 0x01
   ]
 
   @snd_events [
     snd_click: 0x00,
     snd_bell: 0x01,
-    snd_tone: 0x02,
-    snd_max: 0x07,
-    snd_cnt: 0x07 + 1
+    snd_tone: 0x02
   ]
 
   @type_event [
