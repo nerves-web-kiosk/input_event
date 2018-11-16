@@ -694,23 +694,17 @@ defmodule InputEvent.Decoder do
     {type, code, value}
   end
 
-  def decode_type(type) do
-    key_by_value(@event_types, type)
-  end
+  Enum.each(@event_types, fn {k, v} ->
+    def decode_type(unquote(v)), do: unquote(k)
+  end)
 
-  def decode_code(type, code) do
-    case Keyword.get(@type_event, type) do
-      nil -> code
-      events -> key_by_value(events, code)
-    end
-  end
+  def decode_type(unknown), do: unknown
 
-  defp key_by_value(list, value) do
-    {k, _} =
-      Enum.find(list, fn {_, v} ->
-        v == value
-      end)
+  Enum.each(@type_event, fn {type, events} ->
+    Enum.each(events, fn {k, v} ->
+      def decode_code(unquote(type), unquote(v)), do: unquote(k)
+    end)
+  end)
 
-    k
-  end
+  def decode_code(_maybe_unknown_type, unknown_code), do: unknown_code
 end
