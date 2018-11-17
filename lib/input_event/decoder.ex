@@ -1,4 +1,5 @@
 defmodule InputEvent.Decoder do
+  # See https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/input-event-codes.h for codes.
   @event_types [
     ev_syn: 0x00,
     ev_key: 0x01,
