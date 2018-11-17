@@ -70,76 +70,76 @@ void device_info_free_list(struct device_info *info)
  * otherwise.
  */
 static int is_event_device(const struct dirent *dir) {
-	return strncmp(EVENT_DEV_NAME, dir->d_name, 5) == 0;
+    return strncmp(EVENT_DEV_NAME, dir->d_name, 5) == 0;
 }
 
 int enum_devices() {
-  if (getuid() != 0)
-	  warnx("Not running as root, no devices may be available.");
+    if (getuid() != 0)
+        warnx("Not running as root, no devices may be available.");
 
-  struct device_info *device_list = find_input_devices();
-  int device_list_len = 0;
-  for (struct device_info *device = device_list;
-         device != NULL;
-         device = device->next)
+    struct device_info *device_list = find_input_devices();
+    int device_list_len = 0;
+    for (struct device_info *device = device_list;
+            device != NULL;
+            device = device->next)
         device_list_len++;
-  debug("Found %d devices", device_list_len);
-  char resp[4096];
-  int resp_index = sizeof(uint16_t); // Space for payload size
-  resp[resp_index++] = response_id;
-  ei_encode_version(resp, &resp_index);
-  ei_encode_list_header(resp, &resp_index, device_list_len);
+    debug("Found %d devices", device_list_len);
+    char resp[4096];
+    int resp_index = sizeof(uint16_t); // Space for payload size
+    resp[resp_index++] = response_id;
+    ei_encode_version(resp, &resp_index);
+    ei_encode_list_header(resp, &resp_index, device_list_len);
 
-  for (struct device_info *device = device_list;
-         device != NULL;
-         device = device->next) {
-    ei_encode_tuple_header(resp, &resp_index, 2);
-    ei_encode_binary(resp, &resp_index, device->fd, strlen(device->fd));
-    ei_encode_binary(resp, &resp_index, device->name,strlen(device->name));
-  }
-  ei_encode_empty_list(resp, &resp_index);
-  erlcmd_send(resp, resp_index);
-  device_info_free_list(device_list);
-  return 0;
+    for (struct device_info *device = device_list;
+            device != NULL;
+            device = device->next) {
+        ei_encode_tuple_header(resp, &resp_index, 2);
+        ei_encode_binary(resp, &resp_index, device->fd, strlen(device->fd));
+        ei_encode_binary(resp, &resp_index, device->name,strlen(device->name));
+    }
+    ei_encode_empty_list(resp, &resp_index);
+    erlcmd_send(resp, resp_index);
+    device_info_free_list(device_list);
+    return 0;
 }
 
 struct device_info *find_input_devices() {
-  struct dirent **namelist;
-	int i, ndev, devnum;
-	char *filename;
+    struct dirent **namelist;
+    int i, ndev, devnum;
+    char *filename;
 
-  struct device_info *info = NULL;
+    struct device_info *info = NULL;
 
-  ndev = scandir(DEV_INPUT_EVENT, &namelist, is_event_device, alphasort);
-	if (ndev <= 0)
-		return info;
+    ndev = scandir(DEV_INPUT_EVENT, &namelist, is_event_device, alphasort);
+    if (ndev <= 0)
+        return info;
 
-  for (i = 0; i < ndev; i++)
-	{
+    for (i = 0; i < ndev; i++)
+    {
 
-		char fname[64];
-		int fd = -1;
-		char name[256] = "???";
+        char fname[64];
+        int fd = -1;
+        char name[256] = "???";
 
-		snprintf(fname, sizeof(fname),
-			 DEV_INPUT_EVENT "/%.32s", namelist[i]->d_name);
-		fd = open(fname, O_RDONLY);
-		if (fd < 0)
-			continue;
+        snprintf(fname, sizeof(fname),
+                 DEV_INPUT_EVENT "/%.32s", namelist[i]->d_name);
+        fd = open(fname, O_RDONLY);
+        if (fd < 0)
+            continue;
 
-		ioctl(fd, EVIOCGNAME(sizeof(name)), name);
-    close(fd);
+        ioctl(fd, EVIOCGNAME(sizeof(name)), name);
+        close(fd);
 
-    struct device_info *new_info = device_info_alloc();
+        struct device_info *new_info = device_info_alloc();
 
-    new_info->fd = strdup(fname);
-    new_info->name = strdup(name);
+        new_info->fd = strdup(fname);
+        new_info->name = strdup(name);
 
-    new_info->next = info;
-    info = new_info;
+        new_info->next = info;
+        info = new_info;
 
-		free(namelist[i]);
-	}
-  free(namelist);
-  return info;
+        free(namelist[i]);
+    }
+    free(namelist);
+    return info;
 }
