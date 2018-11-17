@@ -580,6 +580,19 @@ defmodule InputEvent.Decoder do
     btn_trigger_happy40: 0x2E7
   ]
 
+  @rel_events [
+    rel_x: 0,
+    rel_y: 1,
+    rel_z: 2,
+    rel_rx: 3,
+    rel_ry: 4,
+    rel_rz: 5,
+    rel_hwheel: 6,
+    rel_dial: 7,
+    rel_wheel: 8,
+    rel_misc: 9
+  ]
+
   @abs_events [
     abs_x: 0x00,
     abs_y: 0x01,
@@ -680,7 +693,7 @@ defmodule InputEvent.Decoder do
   @type_event [
     ev_syn: @syn_events,
     ev_key: @key_events,
-    ev_rel: [],
+    ev_rel: @rel_events,
     ev_abs: @abs_events,
     ev_msc: @msc_events,
     ev_sw: @sw_events,
