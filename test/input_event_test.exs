@@ -7,7 +7,7 @@ defmodule InputEventTest do
   test "decode type" do
     assert Decoder.decode(0, 0, 0) == {:ev_syn, :syn_report, 0}
     assert Decoder.decode(1, 0, 0) == {:ev_key, :key_reserved, 0}
-    assert Decoder.decode(2, 0, 0) == {:ev_rel, 0, 0}
+    assert Decoder.decode(2, 0, 0) == {:ev_rel, :rel_x, 0}
     assert Decoder.decode(3, 0, 0) == {:ev_abs, :abs_x, 0}
     assert Decoder.decode(4, 0, 0) == {:ev_msc, :msc_serial, 0}
     assert Decoder.decode(5, 0, 0) == {:ev_sw, :sw_lid, 0}
