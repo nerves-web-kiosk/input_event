@@ -37,14 +37,14 @@ iex> InputEvent.enumerate
 ]
 ```
 
-Here we have a touch screen at `/dev/input/event11`, lets open it.
+There's a touchscreen at `/dev/input/event11`, so let's open it:
 
 ```elixir
 iex> InputEvent.start_link "/dev/input/event11"
 {:ok, #PID<0.197.0>}
 ```
 
-Lets touch the screen to test
+Touch the screen to test
 
 ```elixir
 iex> flush
