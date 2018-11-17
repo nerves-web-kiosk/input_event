@@ -680,31 +680,39 @@ defmodule InputEvent.Decoder do
   @type_event [
     ev_syn: @syn_events,
     ev_key: @key_events,
+    ev_rel: [],
     ev_abs: @abs_events,
     ev_msc: @msc_events,
+    ev_sw: @sw_events,
     ev_led: @led_events,
-    ev_rep: @rep_events,
     ev_snd: @snd_events,
-    ev_sw: @sw_events
+    ev_rep: @rep_events,
+    ev_ff: [],
+    ev_pwr: [],
+    ev_ff_status: []
   ]
 
-  def decode(type, code, value) do
-    type = decode_type(type)
-    code = decode_code(type, code)
-    {type, code, value}
-  end
+  @type type :: 0..0xFFFF
+  @type code :: 0..0xFFFF
+  @type value :: integer()
 
-  Enum.each(@event_types, fn {k, v} ->
-    def decode_type(unquote(v)), do: unquote(k)
-  end)
+  @doc """
+  Decode the {type, code, value} tuple coming from the Linux input system.
+  """
+  @spec decode(type(), code(), value()) :: {atom(), atom(), value()}
 
-  def decode_type(unknown), do: unknown
-
+  # Use Elixir's pattern matching to create a function for all of the known
+  # possibilities and functions to handle unknown values as best as possible.
   Enum.each(@type_event, fn {type, events} ->
-    Enum.each(events, fn {k, v} ->
-      def decode_code(unquote(type), unquote(v)), do: unquote(k)
+    type_value = Keyword.get(@event_types, type)
+
+    Enum.each(events, fn {code, code_value} ->
+      def decode(unquote(type_value), unquote(code_value), value),
+        do: {unquote(type), unquote(code), value}
     end)
+
+    def decode(unquote(type_value), unknown_code, value), do: {unquote(type), unknown_code, value}
   end)
 
-  def decode_code(_maybe_unknown_type, unknown_code), do: unknown_code
+  def decode(unknown_type, unknown_code, value), do: {unknown_type, unknown_code, value}
 end
