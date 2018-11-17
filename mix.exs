@@ -16,7 +16,8 @@ defmodule InputEvent.Mixfile do
       make_env: make_env(),
       compilers: [:elixir_make | Mix.compilers()],
       deps: deps(),
-      docs: [extras: ["README.md"], main: "readme"]
+      docs: [extras: ["README.md"], main: "readme"],
+      aliases: [format: [&format_c/1, "format"]]
     ]
   end
 
@@ -65,4 +66,16 @@ defmodule InputEvent.Mixfile do
         %{}
     end
   end
+
+  defp format_c([]) do
+    astyle =
+      System.find_executable("astyle") ||
+        Mix.raise("""
+        Could not format C code since astyle is not available.
+        """)
+
+    System.cmd(astyle, ["-n", "-r", "src/*.c", "src/*.h"], into: IO.stream(:stdio, :line))
+  end
+
+  defp format_c(_args), do: true
 end
