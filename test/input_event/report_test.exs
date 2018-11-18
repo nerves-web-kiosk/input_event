@@ -1,4 +1,4 @@
-defmodule ReportTest do
+defmodule InputEvent.ReportTest do
   use ExUnit.Case
 
   alias InputEvent.Report
