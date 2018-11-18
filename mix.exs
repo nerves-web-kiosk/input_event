@@ -1,4 +1,4 @@
-defmodule InputEvent.Mixfile do
+defmodule InputEvent.MixProject do
   use Mix.Project
 
   @app :input_event
@@ -7,8 +7,7 @@ defmodule InputEvent.Mixfile do
     [
       app: @app,
       version: "0.3.1",
-      elixir: "~> 1.3",
-      build_embedded: Mix.env() == :prod,
+      elixir: "~> 1.4",
       start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
@@ -22,7 +21,7 @@ defmodule InputEvent.Mixfile do
   end
 
   def application do
-    [applications: []]
+    []
   end
 
   defp deps do
