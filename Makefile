@@ -24,20 +24,6 @@ endif
 
 DEFAULT_TARGETS ?= priv priv/input_event
 
-# The paths to the EI library and header files are either passed in when
-# compiled by Nerves (crosscompiled builds) or determined by mix.exs for
-# host builds.
-ifeq ($(ERL_EI_INCLUDE_DIR),)
-$(error ERL_EI_INCLUDE_DIR not set. Invoke via mix)
-endif
-ifeq ($(ERL_EI_LIBDIR),)
-$(error ERL_EI_LIBDIR not set. Invoke via mix)
-endif
-
-# Set Erlang-specific compile and linker flags
-ERL_CFLAGS ?= -I$(ERL_EI_INCLUDE_DIR)
-ERL_LDFLAGS ?= -L$(ERL_EI_LIBDIR) -lei
-
 LDFLAGS +=
 CFLAGS += -std=gnu99
 
@@ -61,13 +47,13 @@ OBJ=$(SRC:.c=.o)
 all: priv priv/input_event
 
 %.o: %.c
-	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 priv:
 	mkdir -p priv
 
 priv/input_event: $(OBJ)
-	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
+	$(CC) $^ $(LDFLAGS) -o $@
 	# For host builds, setuid root the input_event binary so that it can read /dev/input/event*
 	SUDO_ASKPASS=$(SUDO_ASKPASS) $(SUDO) -- sh -c 'chown root:root $@; chmod +s $@'
 
