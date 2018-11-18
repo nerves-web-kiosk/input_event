@@ -1,4 +1,4 @@
-defmodule InputEvent.Decoder do
+defmodule InputEvent.Types do
   # See https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/input-event-codes.h for codes.
   @event_types [
     ev_syn: 0x00,
@@ -713,7 +713,7 @@ defmodule InputEvent.Decoder do
   @doc """
   Decode the {type, code, value} tuple coming from the Linux input system.
   """
-  @spec decode(type(), code(), value()) :: {atom(), atom(), value()}
+  @spec decode(type(), code(), value()) :: {atom() | type(), atom() | code(), value()}
 
   # Use Elixir's pattern matching to create a function for all of the known
   # possibilities and functions to handle unknown values as best as possible.
@@ -729,4 +729,22 @@ defmodule InputEvent.Decoder do
   end)
 
   def decode(unknown_type, unknown_code, value), do: {unknown_type, unknown_code, value}
+
+  @doc """
+  Convert a type to it's enumerated form if possible
+  """
+  @spec decode_type(type()) :: atom() | type()
+  def decode_type(type) do
+    {result_type, _code, _value} = decode(type, 0, 0)
+    result_type
+  end
+
+  @doc """
+  Convert a code to it's enumerated form if possible
+  """
+  @spec decode_code(type(), code()) :: atom() | code()
+  def decode_code(type, code) do
+    {_result_type, result_code, _value} = decode(type, code, 0)
+    result_code
+  end
 end

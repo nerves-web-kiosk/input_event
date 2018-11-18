@@ -1,112 +1,124 @@
 defmodule InputEvent do
   use GenServer
-  alias InputEvent.Decoder
+  alias InputEvent.{Info, Report}
+
+  @input_event_report 1
+  @input_event_version 2
+  @input_event_name 3
+  @input_event_id 4
+  @input_event_report_info 5
+  @input_event_ready 6
 
   @moduledoc """
   Elixir interface to Linux input event devices
   """
 
-  @input_event 1
-
   @doc """
   Start a GenServer that reports events from the specified input event device
   """
   @spec start_link(Path.t()) :: :ignore | {:error, any()} | {:ok, pid()}
-  def start_link(input_event_path) do
-    GenServer.start_link(__MODULE__, [input_event_path, self()])
+  def start_link(path) do
+    GenServer.start_link(__MODULE__, [path, self()])
+  end
+
+  @doc """
+  Return information about this input event device
+  """
+  @spec info(GenServer.server()) :: Info.t()
+  def info(server) do
+    GenServer.call(server, :info)
   end
 
   @doc """
   Stop the InputEvent GenServer.
   """
-  def stop(pid) do
-    GenServer.stop(pid)
+  def stop(server) do
+    GenServer.stop(server)
   end
 
-  @spec enumerate() :: [{String.t(), String.t()}]
-  def enumerate() do
+  @doc """
+  Scan the system for input devices and return information on each one.
+  """
+  @spec enumerate() :: [{String.t(), Info.t()}]
+  defdelegate enumerate(), to: InputEvent.Enumerate
+
+  def init([path, caller]) do
     executable = :code.priv_dir(:input_event) ++ '/input_event'
 
     port =
       Port.open({:spawn_executable, executable}, [
-        {:args, ["enumerate"]},
+        {:args, [path]},
         {:packet, 2},
         :use_stdio,
         :binary,
         :exit_status
       ])
 
-    receive do
-      {^port, {:data, <<?r, message::binary>>}} ->
-        :erlang.binary_to_term(message)
-    after
-      5_000 ->
-        Port.close(port)
-        []
-    end
-  end
-
-  def init([input_event_path, caller]) do
-    executable = :code.priv_dir(:input_event) ++ '/input_event'
-
-    port =
-      Port.open({:spawn_executable, executable}, [
-        {:args, [input_event_path]},
-        {:packet, 2},
-        :use_stdio,
-        :binary,
-        :exit_status
-      ])
-
-    state = %{port: port, input_event_path: input_event_path, callback: caller}
+    state = %{port: port, path: path, info: %Info{}, callback: caller, ready: false, deferred: []}
 
     {:ok, state}
   end
 
+  def handle_call(:info, _from, %{ready: true} = state) do
+    {:reply, state.info, state}
+  end
+
+  def handle_call(:info, from, state) do
+    {:noreply, %{state | deferred: [from | state.deferred]}}
+  end
+
   def handle_info({_port, {:data, data}}, state) do
-    process_notification(state, data)
-    {:noreply, state}
+    new_state = process_notification(state, data)
+    {:noreply, new_state}
   end
 
   def handle_info({_port, {:exit_status, _rc}}, state) do
-    send(state.callback, {:input_event, state.input_event_path, :disconnect})
-    {:stop, :normal, state}
+    send(state.callback, {:input_event, state.path, :disconnect})
+    {:stop, :port_crashed, state}
   end
 
   def handle_info(other, state) do
     IO.puts("Not expecting: #{inspect(other)}")
-    send(state.callback, {:input_event, state.input_event_path, :error})
+    send(state.callback, {:input_event, state.path, :error})
     {:stop, :error, state}
   end
 
-  defp process_notification(state, <<@input_event, _fd, raw_events::binary>>) do
-    decode_input_events(raw_events, [], [])
-    |> Enum.reverse()
-    |> Enum.each(fn events ->
-      send(state.callback, {:input_event, state.input_event_path, events})
+  defp process_notification(state, <<@input_event_report, _sub, raw_events::binary>>) do
+    Enum.each(Report.decode(raw_events), fn events ->
+      send(state.callback, {:input_event, state.path, events})
     end)
+
+    state
   end
 
-  defp decode_input_events(<<>>, [], all_events), do: all_events
-
-  defp decode_input_events(<<>>, _leftovers, all_events) do
-    # Dropping unterminated events #{inspect(leftovers)}. The kernel shouldn't do this.
-    # NOTE: consider crashing.
-    all_events
+  defp process_notification(state, <<@input_event_version, _sub, version::binary>>) do
+    new_info = %{state.info | input_event_version: version}
+    %{state | info: new_info}
   end
 
-  defp decode_input_events(
-         <<type::unsigned-native-16, code::unsigned-native-16, value::signed-native-32,
-           rest::binary>>,
-         events,
-         all_events
+  defp process_notification(state, <<@input_event_name, _sub, name::binary>>) do
+    new_info = %{state.info | name: name}
+    %{state | info: new_info}
+  end
+
+  defp process_notification(
+         state,
+         <<@input_event_id, _sub, bus::native-16, vendor::native-16, product::native-16,
+           version::native-16>>
        ) do
-    case Decoder.decode(type, code, value) do
-      {:ev_syn, :syn_report, _ignore} ->
-        decode_input_events(rest, [], [Enum.reverse(events) | all_events])
+    new_info = %{state.info | bus: bus, vendor: vendor, product: product, version: version}
+    %{state | info: new_info}
+  end
 
-      event ->
-        decode_input_events(rest, [event | events], all_events)
-    end
+  defp process_notification(state, <<@input_event_report_info, type, raw_report_info::binary>>) do
+    old_report_info = state.info.report_info
+    report_info = Info.decode_report_info(type, raw_report_info)
+    new_info = %{state.info | report_info: [report_info | old_report_info]}
+    %{state | info: new_info}
+  end
+
+  defp process_notification(state, <<@input_event_ready, _sub>>) do
+    Enum.each(state.deferred, fn client -> GenServer.reply(client, state.info) end)
+    %{state | ready: true, deferred: []}
   end
 end
