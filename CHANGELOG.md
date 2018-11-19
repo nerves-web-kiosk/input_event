@@ -1,5 +1,22 @@
 # InputEvent
 
+## v0.4.0
+
+* Breaking changes
+  * Enumerating input_event devices returns all device info instead of just
+    the device name.
+    
+    **`< 0.4.0`**
+    `{"/dev/input/eventX", "Device name"}`
+
+    **`>= 0.4.0`**
+    `{"/dev/input/eventX", %InputEvent.Info{name: "Device name"}}`
+
+* Enhancements
+  * Major refactoring and clean up in the c code. Thanks @fhunleth!
+  * Added support for relative mouse events.
+  * Moved input decoding to Elixir.
+
 ## v0.3.1
 
 * Bug fixes
