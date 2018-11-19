@@ -1,0 +1,34 @@
+# Elixir CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-elixir/ for more details
+
+install_system_deps: &install_system_deps
+  run:
+    name: Install system dependencies
+    command: |
+      sudo apt update -qq
+      sudo apt install astyle -y -qq
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/elixir:1.7.3
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - <<: *install_system_deps
+      - restore_cache:
+          keys:
+            - v1-dependency-cache-{{ checksum "mix.lock" }}
+      - run: mix local.hex --force
+      - run: mix deps.get --only test
+      - run: mix format --check-formatted
+      - run: mix hex.build
+      - run: mix test
+      - run: mix docs
+      - save_cache:
+          key: v1-dependency-cache-{{ checksum "mix.lock" }}
+          paths:
+            - _build
+            - deps
