@@ -1,4 +1,6 @@
 defmodule InputEvent.Types do
+  @moduledoc false
+
   # See https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/input-event-codes.h for codes.
   @event_types [
     ev_syn: 0x00,

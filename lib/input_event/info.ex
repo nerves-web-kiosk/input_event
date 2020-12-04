@@ -1,4 +1,8 @@
 defmodule InputEvent.Info do
+  @moduledoc """
+  Information about a input event file
+  """
+
   defstruct input_event_version: "",
             name: "",
             bus: 0,

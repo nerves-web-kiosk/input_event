@@ -1,4 +1,6 @@
 defmodule InputEvent.Enumerate do
+  @moduledoc false
+
   @doc """
   Return the paths to all device files
   """

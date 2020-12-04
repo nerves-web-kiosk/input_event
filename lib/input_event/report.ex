@@ -1,4 +1,6 @@
 defmodule InputEvent.Report do
+  @moduledoc false
+
   alias InputEvent.Types
 
   @doc """

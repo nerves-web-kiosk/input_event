@@ -1,12 +1,13 @@
 defmodule InputEvent.MixProject do
   use Mix.Project
 
-  @app :input_event
+  @version "0.4.0"
+  @source_url "https://github.com/nerves-web-kiosk/input_event"
 
   def project do
     [
-      app: @app,
-      version: "0.4.0",
+      app: :input_event,
+      version: @version,
       elixir: "~> 1.4",
       start_permanent: Mix.env() == :prod,
       description: description(),
@@ -16,8 +17,13 @@ defmodule InputEvent.MixProject do
       make_targets: ["all"],
       make_clean: ["clean"],
       deps: deps(),
-      docs: [extras: ["README.md"], main: "readme"],
-      aliases: [format: [&format_c/1, "format"]]
+      docs: docs(),
+      aliases: [format: [&format_c/1, "format"]],
+      preferred_cli_env: %{
+        docs: :docs,
+        "hex.publish": :docs,
+        "hex.build": :docs
+      }
     ]
   end
 
@@ -36,12 +42,20 @@ defmodule InputEvent.MixProject do
     "Elixir interface to Linux input event devices"
   end
 
+  defp docs do
+    [
+      extras: ["README.md"],
+      main: "readme",
+      source_ref: "v#{@version}",
+      source_url: @source_url
+    ]
+  end
+
   defp package do
     [
       files: [
         "lib",
         "src/*.[ch]",
-        "test",
         "mix.exs",
         "README.md",
         "LICENSE",
@@ -49,7 +63,7 @@ defmodule InputEvent.MixProject do
         "Makefile"
       ],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/nerves-web-kiosk/#{@app}"}
+      links: %{"GitHub" => @source_url}
     ]
   end
 
