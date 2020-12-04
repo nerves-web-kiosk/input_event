@@ -8,6 +8,9 @@
 # LDFLAGS	linker flags for linking all binaries
 # ERL_LDFLAGS	additional linker flags for projects referencing Erlang libraries
 
+PREFIX = $(MIX_APP_PATH)/priv
+BUILD  = $(MIX_APP_PATH)/obj
+
 # Check that we're on a supported build platform
 ifeq ($(CROSSCOMPILE),)
     # Not crosscompiling, so check that we're on Linux.
@@ -22,7 +25,7 @@ ifeq ($(CROSSCOMPILE),)
     endif
 endif
 
-DEFAULT_TARGETS ?= priv priv/input_event
+DEFAULT_TARGETS ?= $(PREFIX) $(PREFIX)/input_event
 
 LDFLAGS +=
 CFLAGS += -std=gnu99
@@ -40,22 +43,25 @@ endif
 #CFLAGS += -DDEBUG
 
 SRC=$(wildcard src/*.c)
-OBJ=$(SRC:.c=.o)
+OBJ = $(SRC:src/%.c=$(BUILD)/%.o)
+
+calling_from_make:
+	mix compile
 
 .PHONY: all clean
 
-all: priv priv/input_event
+all: $(PREFIX) $(BUILD) $(PREFIX)/input_event
 
-%.o: %.c
+$(BUILD)/%.o: src/%.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-priv:
-	mkdir -p priv
+$(PREFIX) $(BUILD):
+	mkdir -p $@
 
-priv/input_event: $(OBJ)
+$(PREFIX)/input_event: $(OBJ)
 	$(CC) $^ $(LDFLAGS) -o $@
 	# For host builds, setuid root the input_event binary so that it can read /dev/input/event*
 	SUDO_ASKPASS=$(SUDO_ASKPASS) $(SUDO) -- sh -c 'chown root:root $@; chmod +s $@'
 
 clean:
-	rm -f priv/input_event src/*.o
+	rm -f $(PREFIX)/input_event $(BUILD)/*.o
