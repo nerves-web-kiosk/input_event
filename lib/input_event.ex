@@ -32,6 +32,7 @@ defmodule InputEvent do
   @doc """
   Stop the InputEvent GenServer.
   """
+  @spec stop(GenServer.server()) :: :ok
   def stop(server) do
     GenServer.stop(server)
   end
@@ -42,6 +43,7 @@ defmodule InputEvent do
   @spec enumerate() :: [{String.t(), Info.t()}]
   defdelegate enumerate(), to: InputEvent.Enumerate
 
+  @impl GenServer
   def init([path, caller]) do
     executable = :code.priv_dir(:input_event) ++ '/input_event'
 
@@ -59,6 +61,7 @@ defmodule InputEvent do
     {:ok, state}
   end
 
+  @impl GenServer
   def handle_call(:info, _from, %{ready: true} = state) do
     {:reply, state.info, state}
   end
@@ -67,6 +70,7 @@ defmodule InputEvent do
     {:noreply, %{state | deferred: [from | state.deferred]}}
   end
 
+  @impl GenServer
   def handle_info({_port, {:data, data}}, state) do
     new_state = process_notification(state, data)
     {:noreply, new_state}
