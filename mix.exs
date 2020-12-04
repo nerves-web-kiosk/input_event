@@ -13,6 +13,8 @@ defmodule InputEvent.MixProject do
       package: package(),
       make_clean: ["clean"],
       compilers: [:elixir_make | Mix.compilers()],
+      make_targets: ["all"],
+      make_clean: ["clean"],
       deps: deps(),
       docs: [extras: ["README.md"], main: "readme"],
       aliases: [format: [&format_c/1, "format"]]
@@ -25,8 +27,8 @@ defmodule InputEvent.MixProject do
 
   defp deps do
     [
-      {:elixir_make, "~> 0.4", runtime: false},
-      {:ex_doc, "~> 0.18", only: [:dev, :test], runtime: false}
+      {:elixir_make, "~> 0.6", runtime: false},
+      {:ex_doc, "~> 0.23", only: [:docs], runtime: false}
     ]
   end
 
@@ -46,9 +48,8 @@ defmodule InputEvent.MixProject do
         "CHANGELOG.md",
         "Makefile"
       ],
-      maintainers: ["Justin Schneck"],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/letoteteam/#{@app}"}
+      links: %{"GitHub" => "https://github.com/nerves-web-kiosk/#{@app}"}
     ]
   end
 
