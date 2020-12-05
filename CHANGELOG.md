@@ -1,11 +1,17 @@
-# InputEvent
+# Changelog
+
+## v0.4.1
+
+* Bug fixes
+  * Compile the port binary to the `_build` directory to avoid issues when
+    changing mix targets
 
 ## v0.4.0
 
 * Breaking changes
   * Enumerating input_event devices returns all device info instead of just
     the device name.
-    
+
     **`< 0.4.0`**
     `{"/dev/input/eventX", "Device name"}`
 
