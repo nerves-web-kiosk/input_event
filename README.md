@@ -306,3 +306,10 @@ Notice that if there's no movement in an axis that you won't get an update for t
 ```
 
 The power button input device works just like a one-button keyboard.
+
+### Permissions
+To be able to read from `/dev/input/event*` you need to add user to the `input` group:
+```
+$ sudo usermod -a -G input <username>
+```
+And restart user session.
