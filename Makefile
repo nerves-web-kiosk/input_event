@@ -30,15 +30,6 @@ DEFAULT_TARGETS ?= $(PREFIX) $(PREFIX)/input_event
 LDFLAGS +=
 CFLAGS += -std=gnu99
 
-# If not cross-compiling, then run sudo by default
-ifeq ($(origin CROSSCOMPILE), undefined)
-SUDO_ASKPASS ?= /usr/bin/ssh-askpass
-SUDO ?= sudo
-else
-# If cross-compiling, then permissions need to be set some build system-dependent way
-SUDO ?= true
-endif
-
 # Enable for debug messages
 #CFLAGS += -DDEBUG
 
@@ -60,8 +51,6 @@ $(PREFIX) $(BUILD):
 
 $(PREFIX)/input_event: $(OBJ)
 	$(CC) $^ $(LDFLAGS) -o $@
-	# For host builds, setuid root the input_event binary so that it can read /dev/input/event*
-	SUDO_ASKPASS=$(SUDO_ASKPASS) $(SUDO) -- sh -c 'chown root:root $@; chmod +s $@'
 
 clean:
 	rm -f $(PREFIX)/input_event $(BUILD)/*.o
