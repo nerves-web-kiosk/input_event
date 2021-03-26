@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.2
+
+* Bug fixes
+  * Remove call to `sudo` and add instructions for how to read input events as a
+    user the right way. Thanks to Józef Chraplewski for this fix.
+
 ## v0.4.1
 
 * Bug fixes
