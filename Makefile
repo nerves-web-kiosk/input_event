@@ -21,11 +21,11 @@ ifeq ($(CROSSCOMPILE),)
         $(warning this should be done automatically.)
         $(warning .)
         $(warning Skipping C compilation unless targets explicitly passed to make.)
-	  DEFAULT_TARGETS = priv
+	DEFAULT_TARGETS = $(PREFIX)
     endif
 endif
 
-DEFAULT_TARGETS ?= $(PREFIX) $(PREFIX)/input_event
+DEFAULT_TARGETS ?= $(PREFIX) $(BUILD) $(PREFIX)/input_event
 
 LDFLAGS +=
 CFLAGS += -std=gnu99
@@ -39,18 +39,23 @@ OBJ = $(SRC:src/%.c=$(BUILD)/%.o)
 calling_from_make:
 	mix compile
 
-.PHONY: all clean
-
-all: $(PREFIX) $(BUILD) $(PREFIX)/input_event
+all: $(DEFAULT_TARGETS)
 
 $(BUILD)/%.o: src/%.c
+	@echo " CC $(notdir $@)"
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 $(PREFIX) $(BUILD):
 	mkdir -p $@
 
 $(PREFIX)/input_event: $(OBJ)
+	@echo " LD $(notdir $@)"
 	$(CC) $^ $(LDFLAGS) -o $@
 
 clean:
-	rm -f $(PREFIX)/input_event $(BUILD)/*.o
+	$(RM) $(PREFIX)/input_event $(BUILD)/*.o
+
+.PHONY: all clean calling_from_make
+
+# Don't echo commands unless the caller exports "V=1"
+${V}.SILENT:
