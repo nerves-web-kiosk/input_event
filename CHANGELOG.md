@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.4.3
+
+* Bug fixes
+  * Fix builds on MacOS. InputEvent doesn't work on MacOS, but it will now
+    compile successfully.
+  * Fix a typespec so that Dialyzer runs successfully
+
+* Improvements
+  * The build process will be less verbose. If there's an error and you need the
+    verbosity to debug it, run `V=1 mix compile` or `V=1 make`.
+
 ## v0.4.2
 
 * Bug fixes
