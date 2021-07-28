@@ -19,6 +19,9 @@ defmodule InputEvent.MixProject do
       deps: deps(),
       docs: docs(),
       aliases: [format: [&format_c/1, "format"]],
+      dialyzer: [
+        flags: [:unmatched_returns, :error_handling, :race_conditions, :underspecs]
+      ],
       preferred_cli_env: %{
         docs: :docs,
         "hex.publish": :docs,
@@ -34,7 +37,8 @@ defmodule InputEvent.MixProject do
   defp deps do
     [
       {:elixir_make, "~> 0.6", runtime: false},
-      {:ex_doc, "~> 0.23", only: [:docs], runtime: false}
+      {:ex_doc, "~> 0.23", only: [:docs], runtime: false},
+      {:dialyxir, "~> 1.1.0", only: :dev, runtime: false}
     ]
   end
 
