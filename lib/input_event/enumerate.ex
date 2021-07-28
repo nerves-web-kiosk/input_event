@@ -12,7 +12,7 @@ defmodule InputEvent.Enumerate do
   @doc """
   Enumerate all input event devices
   """
-  @spec enumerate() :: [{String.t(), Info.t()}]
+  @spec enumerate() :: [{String.t(), InputEvent.Info.t()}]
   def enumerate() do
     all_devices()
     |> Enum.map(&get_info/1)
