@@ -16,9 +16,15 @@ defmodule InputEvent do
   @doc """
   Start a GenServer that reports events from the specified input event device
   """
-  @spec start_link(Path.t()) :: :ignore | {:error, any()} | {:ok, pid()}
-  def start_link(path) do
-    GenServer.start_link(__MODULE__, [path, self()])
+  @spec start_link(Path.t() | keyword()) :: GenServer.on_start()
+  def start_link(path) when is_binary(path) do
+    start_link(path: path)
+  end
+
+  def start_link(init_args) when is_list(init_args) do
+    init_args[:path] || raise ArgumentError, "InputEvent requires a input event device path"
+    updated_args = Keyword.put_new(init_args, :grab, false)
+    GenServer.start_link(__MODULE__, [updated_args[:path], self(), updated_args[:grab]])
   end
 
   @doc """
@@ -44,12 +50,12 @@ defmodule InputEvent do
   defdelegate enumerate(), to: InputEvent.Enumerate
 
   @impl GenServer
-  def init([path, caller]) do
+  def init([path, caller, grab]) do
     executable = :code.priv_dir(:input_event) ++ '/input_event'
 
     port =
       Port.open({:spawn_executable, executable}, [
-        {:args, [path]},
+        {:args, [path, grab]},
         {:packet, 2},
         :use_stdio,
         :binary,

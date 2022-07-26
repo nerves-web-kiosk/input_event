@@ -190,7 +190,7 @@ static void send_report_info(int fd)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2)
+    if (argc < 2)
         errx(EXIT_FAILURE, "Pass the device to monitor");
 
     const char *input_path = argv[1];
@@ -202,6 +202,10 @@ int main(int argc, char *argv[])
     send_name(fd);
     send_id(fd);
     send_report_info(fd);
+
+    if (argc == 3 && !strcmp(argv[2], "true"))
+        if (ioctl(fd, EVIOCGRAB, (void *)1) != 0)
+            errx(EXIT_FAILURE, "Failed to grab device");
 
     send_report(NULL, 0, INPUT_EVENT_READY, 0);
 
