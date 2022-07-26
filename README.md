@@ -307,6 +307,15 @@ Notice that if there's no movement in an axis that you won't get an update for t
 
 The power button input device works just like a one-button keyboard.
 
+## Grab device
+
+Devices can be grabbed to prevent output into other applications.
+
+```elixir
+iex> InputEvent.start_link(path: "/dev/input/event0", grab: true)
+{:ok, #PID<0.197.0>}
+```
+
 ### Permissions
 
 To be able to read from `/dev/input/event*` you need to add user to the `input`
