@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.0
+
+* Changes
+  * Add option to grab input devices so that events don't get processed
+    elsewhere (like IEx consoles). Thanks to @Xeronel for this feature.
+
 ## v1.0.0
 
 This release only changes the version number. No code changed.
