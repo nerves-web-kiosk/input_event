@@ -20,7 +20,7 @@ defmodule InputEvent.MixProject do
       docs: docs(),
       aliases: [format: [&format_c/1, "format"]],
       dialyzer: [
-        flags: [:unmatched_returns, :error_handling, :race_conditions, :underspecs]
+        flags: [:missing_return, :extra_return, :unmatched_returns, :error_handling, :underspecs]
       ],
       preferred_cli_env: %{
         docs: :docs,
