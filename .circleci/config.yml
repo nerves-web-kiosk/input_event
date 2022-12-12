@@ -37,6 +37,7 @@ jobs:
       - run: mix hex.build
       - run: mix test
       - run: mix dialyzer
+      - run: mix credo -a --strict
       - save_cache:
           key: v1-mix-cache-{{ checksum "mix.lock" }}
           paths:

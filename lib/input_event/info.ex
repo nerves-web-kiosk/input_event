@@ -24,6 +24,8 @@ defmodule InputEvent.Info do
   @doc """
   Helper function for decoding raw report information from the port driver.
   """
+  @spec decode_report_info(InputEvent.Types.type_number(), binary()) ::
+          {InputEvent.Types.type(), [InputEvent.Types.code() | {InputEvent.Types.code(), map()}]}
   def decode_report_info(raw_type, raw_report_info) do
     type = InputEvent.Types.decode_type(raw_type)
 

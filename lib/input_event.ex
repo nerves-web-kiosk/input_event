@@ -1,4 +1,8 @@
 defmodule InputEvent do
+  @moduledoc """
+  Elixir interface to Linux input event devices
+  """
+
   use GenServer
   alias InputEvent.{Info, Report}
 
@@ -8,10 +12,6 @@ defmodule InputEvent do
   @input_event_id 4
   @input_event_report_info 5
   @input_event_ready 6
-
-  @moduledoc """
-  Elixir interface to Linux input event devices
-  """
 
   @doc """
   Start a GenServer that reports events from the specified input event device
