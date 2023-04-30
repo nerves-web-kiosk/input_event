@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.2.0
+
+* Changes
+  * Add more documenation and typespecs. The typespecs should be more useful now
+    for verifying code with Dialyzer.
+  * Bump minimum supported Elixir version to 1.10.
+
 ## v1.1.0
 
 * Changes
