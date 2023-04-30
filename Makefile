@@ -33,15 +33,15 @@ CFLAGS += -std=gnu99
 # Enable for debug messages
 #CFLAGS += -DDEBUG
 
-SRC=$(wildcard src/*.c)
-OBJ = $(SRC:src/%.c=$(BUILD)/%.o)
+SRC=$(wildcard c_src/*.c)
+OBJ = $(SRC:c_src/%.c=$(BUILD)/%.o)
 
 calling_from_make:
 	mix compile
 
 all: $(DEFAULT_TARGETS)
 
-$(BUILD)/%.o: src/%.c
+$(BUILD)/%.o: c_src/%.c
 	@echo " CC $(notdir $@)"
 	$(CC) -c $(CFLAGS) -o $@ $<
 

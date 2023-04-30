@@ -23,5 +23,5 @@ erl_crash.dump
 input_event-*.tar
 
 # Ignore C build products
-src/*.o
+c_src/*.o
 priv/input_event

@@ -60,7 +60,7 @@ defmodule InputEvent.MixProject do
     [
       files: [
         "lib",
-        "src/*.[ch]",
+        "c_src/*.[ch]",
         "mix.exs",
         "README.md",
         "LICENSE",
@@ -79,7 +79,7 @@ defmodule InputEvent.MixProject do
         Could not format C code since astyle is not available.
         """)
 
-    System.cmd(astyle, ["-n", "-r", "src/*.c", "src/*.h"], into: IO.stream(:stdio, :line))
+    System.cmd(astyle, ["-n", "-r", "c_src/*.c", "c_src/*.h"], into: IO.stream(:stdio, :line))
   end
 
   defp format_c(_args), do: true
