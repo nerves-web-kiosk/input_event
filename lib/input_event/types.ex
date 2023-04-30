@@ -708,50 +708,11 @@ defmodule InputEvent.Types do
     ev_ff_status: []
   ]
 
-  @type type_number() :: 0..0xFFFF
-  @type type_name() ::
-          :ev_syn
-          | :ev_key
-          | :ev_rel
-          | :ev_abs
-          | :ev_msc
-          | :ev_sw
-          | :ev_led
-          | :ev_snd
-          | :ev_rep
-          | :ev_ff
-          | :ev_pwr
-          | :ev_ff_status
-
-  @typedoc """
-  Event type
-
-  Usually these are translated to an atom that corresponds with the Linux event type.
-  """
-  @type type() :: type_name() | type_number()
-
-  @type code_number() :: 0..0xFFFF
-
-  @typedoc """
-  Event code
-
-  Usually these are translated to an atom that correspons with the Linux event code.
-  Event codes depend on the event type.
-  """
-  @type code() :: atom() | code_number()
-
-  @typedoc """
-  Event value
-
-  See the event type and code for how to interpret the value. For example, it could be a
-  0 or 1 signifying a key press or release, or it could be an x or y coordinate or delta.
-  """
-  @type value() :: integer()
-
   @doc """
   Decode the {type, code, value} tuple coming from the Linux input system.
   """
-  @spec decode(type(), code_number(), value()) :: {type(), code(), value()}
+  @spec decode(InputEvent.type(), InputEvent.code_number(), InputEvent.value()) ::
+          {InputEvent.type(), InputEvent.code(), InputEvent.value()}
 
   # Use Elixir's pattern matching to create a function for all of the known
   # possibilities and functions to handle unknown values as best as possible.
@@ -771,7 +732,7 @@ defmodule InputEvent.Types do
   @doc """
   Convert a type to it's enumerated form if possible
   """
-  @spec decode_type(type_number()) :: type()
+  @spec decode_type(InputEvent.type_number()) :: InputEvent.type()
   def decode_type(type) do
     {result_type, _code, _value} = decode(type, 0, 0)
     result_type
@@ -780,7 +741,7 @@ defmodule InputEvent.Types do
   @doc """
   Convert a code to it's enumerated form if possible
   """
-  @spec decode_code(type(), code_number()) :: code()
+  @spec decode_code(InputEvent.type(), InputEvent.code_number()) :: InputEvent.code()
   def decode_code(type, code) do
     {_result_type, result_code, _value} = decode(type, code, 0)
     result_code

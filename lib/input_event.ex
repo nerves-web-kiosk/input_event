@@ -2,9 +2,52 @@ defmodule InputEvent do
   @moduledoc """
   Elixir interface to Linux input event devices
   """
-
   use GenServer
-  alias InputEvent.{Info, Report}
+
+  alias InputEvent.Info
+  alias InputEvent.Report
+
+  @typedoc "An unknown event type"
+  @type type_number() :: 0..0xFFFF
+  @typedoc "The type of event"
+  @type type_name() ::
+          :ev_syn
+          | :ev_key
+          | :ev_rel
+          | :ev_abs
+          | :ev_msc
+          | :ev_sw
+          | :ev_led
+          | :ev_snd
+          | :ev_rep
+          | :ev_ff
+          | :ev_pwr
+          | :ev_ff_status
+
+  @typedoc """
+  Event type
+
+  Usually these are translated to an atom that corresponds with the Linux event type.
+  """
+  @type type() :: type_name() | type_number()
+
+  @type code_number() :: 0..0xFFFF
+
+  @typedoc """
+  Event code
+
+  Usually these are translated to an atom that corresponds with the Linux event code.
+  Event codes depend on the event type.
+  """
+  @type code() :: atom() | code_number()
+
+  @typedoc """
+  Event value
+
+  See the event type and code for how to interpret the value. For example, it could be a
+  0 or 1 signifying a key press or release, or it could be an x or y coordinate or delta.
+  """
+  @type value() :: integer()
 
   @input_event_report 1
   @input_event_version 2
@@ -13,18 +56,30 @@ defmodule InputEvent do
   @input_event_report_info 5
   @input_event_ready 6
 
+  @typedoc """
+  Options for the InputEvent Genserver
+  """
+  @type options() :: [path: String.t(), grab: boolean(), receiver: pid() | atom()]
+
   @doc """
   Start a GenServer that reports events from the specified input event device
+
+  Options:
+  * `:path` - the path to the input event device (e.g., `"/dev/input/event0"`)
+  * `:grab` - set to true to prevent events from being passed to other applications (defaults to `false`)
+  * `:receiver` - the pid or name of the process that receives events (defaults to the process that calls `start_link/1`
+
+  Note that passing the device path rather than a keyword list to `start_link/1` is deprecated.
   """
-  @spec start_link(Path.t() | keyword()) :: GenServer.on_start()
+  @spec start_link(String.t() | options()) :: GenServer.on_start()
   def start_link(path) when is_binary(path) do
     start_link(path: path)
   end
 
-  def start_link(init_args) when is_list(init_args) do
-    init_args[:path] || raise ArgumentError, "InputEvent requires a input event device path"
-    updated_args = Keyword.put_new(init_args, :grab, false)
-    GenServer.start_link(__MODULE__, [updated_args[:path], self(), updated_args[:grab]])
+  def start_link(options) when is_list(options) do
+    options[:path] || raise ArgumentError, "InputEvent requires a input event device path"
+    updated_options = Keyword.put_new(options, :receiver, self())
+    GenServer.start_link(__MODULE__, updated_options)
   end
 
   @doc """
@@ -50,8 +105,12 @@ defmodule InputEvent do
   defdelegate enumerate(), to: InputEvent.Enumerate
 
   @impl GenServer
-  def init([path, caller, grab]) do
+  def init(init_args) do
     executable = :code.priv_dir(:input_event) ++ '/input_event'
+
+    path = Keyword.fetch!(init_args, :path)
+    grab = Keyword.get(init_args, :grab, false)
+    receiver = Keyword.fetch!(init_args, :receiver)
 
     port =
       Port.open({:spawn_executable, executable}, [
@@ -62,7 +121,14 @@ defmodule InputEvent do
         :exit_status
       ])
 
-    state = %{port: port, path: path, info: %Info{}, callback: caller, ready: false, deferred: []}
+    state = %{
+      port: port,
+      path: path,
+      info: %Info{},
+      callback: receiver,
+      ready: false,
+      deferred: []
+    }
 
     {:ok, state}
   end

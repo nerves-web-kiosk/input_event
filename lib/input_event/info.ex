@@ -11,7 +11,7 @@ defmodule InputEvent.Info do
             version: 0,
             report_info: []
 
-  @type t :: %__MODULE__{
+  @type t() :: %__MODULE__{
           input_event_version: String.t(),
           name: String.t(),
           bus: non_neg_integer(),
@@ -24,8 +24,8 @@ defmodule InputEvent.Info do
   @doc """
   Helper function for decoding raw report information from the port driver.
   """
-  @spec decode_report_info(InputEvent.Types.type_number(), binary()) ::
-          {InputEvent.Types.type(), [InputEvent.Types.code() | {InputEvent.Types.code(), map()}]}
+  @spec decode_report_info(InputEvent.type_number(), binary()) ::
+          {InputEvent.type(), [InputEvent.code() | {InputEvent.code(), map()}]}
   def decode_report_info(raw_type, raw_report_info) do
     type = InputEvent.Types.decode_type(raw_type)
 
