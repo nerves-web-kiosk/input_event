@@ -1,6 +1,8 @@
 # InputEvent
 
 [![Hex version](https://img.shields.io/hexpm/v/input_event.svg "Hex version")](https://hex.pm/packages/input_event)
+[![API docs](https://img.shields.io/hexpm/v/input_event.svg?label=hexdocs "API docs")](https://hexdocs.pm/input_event)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/nerves-web-kiosk/input_event/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/nerves-web-kiosk/input_event/tree/main)
 
 Elixir interface to Linux input event devices. Using `input_event`, you can
 
