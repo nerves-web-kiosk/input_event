@@ -51,6 +51,16 @@ defmodule InputEvent do
   """
   @type value() :: integer()
 
+  @typedoc """
+  Event structure
+  """
+  @type event() :: {type(), code(), value()}
+
+  @typedoc """
+  Message that is sent to the caller when input event received
+  """
+  @type events_message() :: {:input_event, String.t(), [event()]}
+
   @input_event_report 1
   @input_event_version 2
   @input_event_name 3
@@ -61,7 +71,12 @@ defmodule InputEvent do
   @typedoc """
   Options for the InputEvent Genserver
   """
-  @type options() :: [path: String.t(), grab: boolean(), receiver: pid() | atom()]
+  @type options() :: [
+          path: String.t(),
+          grab: boolean(),
+          receiver: pid(),
+          initial_events: boolean() | atom()
+        ]
 
   @doc """
   Start a GenServer that reports events from the specified input event device
@@ -70,6 +85,7 @@ defmodule InputEvent do
   * `:path` - the path to the input event device (e.g., `"/dev/input/event0"`)
   * `:grab` - set to true to prevent events from being passed to other applications (defaults to `false`)
   * `:receiver` - the pid or name of the process that receives events (defaults to the process that calls `start_link/1`
+  * `:initial_events` - set to `true` to receive to current state of each key as events on start up
 
   Note that passing the device path rather than a keyword list to `start_link/1` is deprecated.
   """
@@ -127,6 +143,7 @@ defmodule InputEvent do
       port: port,
       path: path,
       info: %Info{},
+      initial_events: init_args[:initial_events] || false,
       callback: receiver,
       ready: false,
       deferred: []
@@ -189,7 +206,12 @@ defmodule InputEvent do
 
   defp process_notification(state, <<@input_event_report_info, type, raw_report_info::binary>>) do
     old_report_info = state.info.report_info
-    report_info = Info.decode_report_info(type, raw_report_info)
+    {report_info, initial_events} = Info.decode_report_info(type, raw_report_info)
+
+    if state.initial_events do
+      Enum.each(initial_events, &send(state.callback, {:input_event, state.path, [&1]}))
+    end
+
     new_info = %{state.info | report_info: [report_info | old_report_info]}
     %{state | info: new_info}
   end

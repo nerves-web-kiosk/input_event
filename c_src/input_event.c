@@ -153,6 +153,10 @@ static void send_report_info(int fd)
     if (ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]) < 0)
         err(EXIT_FAILURE, "EVIOCGBIT");
 
+    char key_bitmask[KEY_MAX / 8];
+    if (ioctl(fd, EVIOCGKEY(sizeof(key_bitmask)), key_bitmask) < 0)
+        err(EXIT_FAILURE, "EVIOCGKEY");
+
     for (uint16_t i = 1; i < EV_MAX; i++) {
         if (test_bit(i, bit[0]) && i != EV_REP) {
             if (ioctl(fd, EVIOCGBIT(i, KEY_MAX), bit[i]) < 0)
@@ -168,6 +172,10 @@ static void send_report_info(int fd)
                             err(EXIT_FAILURE, "EVIOCGABS(%d)", j);
                         for (int k = 0; k < 6; k++)
                             p = append_int32(p, abs[k]);
+                    } else {
+                        // Add initial value to the report in case user wants them
+                        uint16_t value = (key_bitmask[j / 8] & (1 << (j % 8))) != 0;
+                        p = append_uint16(p, value);
                     }
                 }
             }

@@ -21,29 +21,42 @@ defmodule InputEvent.Info do
           report_info: [{atom(), [any()]}]
         }
 
+  @type report_info() :: {InputEvent.type(), [InputEvent.code() | {InputEvent.code(), map()}]}
+
   @doc """
   Helper function for decoding raw report information from the port driver.
+
+  Also returns the initial values of each key as an event
   """
   @spec decode_report_info(InputEvent.type_number(), binary()) ::
-          {InputEvent.type(), [InputEvent.code() | {InputEvent.code(), map()}]}
+          {report_info(), [InputEvent.event()]}
   def decode_report_info(raw_type, raw_report_info) do
     type = InputEvent.Types.decode_type(raw_type)
+    {codes, initial_events} = decode_codes(raw_type, raw_report_info, type)
 
-    {type, decode_codes(raw_type, raw_report_info)}
+    {{type, codes}, initial_events}
   end
 
-  defp decode_codes(0x03, raw_report_info) do
-    for <<code::native-16, value::signed-native-32, min::signed-native-32, max::signed-native-32,
-          fuzz::signed-native-32, flat::signed-native-32,
-          resolution::signed-native-32 <- raw_report_info>> do
-      {InputEvent.Types.decode_code(0x03, code),
-       %{value: value, min: min, max: max, fuzz: fuzz, flat: flat, resolution: resolution}}
-    end
+  defp decode_codes(0x03, raw_report_info, type) do
+    codes =
+      for <<code::native-16, value::signed-native-32, min::signed-native-32,
+            max::signed-native-32, fuzz::signed-native-32, flat::signed-native-32,
+            resolution::signed-native-32 <- raw_report_info>> do
+        {InputEvent.Types.decode_code(0x03, code),
+         %{value: value, min: min, max: max, fuzz: fuzz, flat: flat, resolution: resolution}}
+      end
+
+    initial_events = for {code, %{value: value}} <- codes, do: {type, code, value}
+    {codes, initial_events}
   end
 
-  defp decode_codes(raw_type, raw_report_info) do
-    for <<code::native-16 <- raw_report_info>> do
-      InputEvent.Types.decode_code(raw_type, code)
-    end
+  defp decode_codes(raw_type, raw_report_info, type) do
+    codes =
+      for <<code::native-16, value::native-16 <- raw_report_info>> do
+        {InputEvent.Types.decode_code(raw_type, code), value}
+      end
+
+    initial_events = for {code, value} <- codes, do: {type, code, value}
+    {Keyword.keys(codes), initial_events}
   end
 end
