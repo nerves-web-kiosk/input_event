@@ -7,6 +7,8 @@ defmodule InputEvent do
   alias InputEvent.Info
   alias InputEvent.Report
 
+  require Logger
+
   @typedoc "An unknown event type"
   @type type_number() :: 0..0xFFFF
   @typedoc "The type of event"
@@ -154,9 +156,8 @@ defmodule InputEvent do
   end
 
   def handle_info(other, state) do
-    IO.puts("Not expecting: #{inspect(other)}")
-    send(state.callback, {:input_event, state.path, :error})
-    {:stop, :error, state}
+    Logger.warning("InputEvent: ignoring #{inspect(other)}")
+    {:noreply, state}
   end
 
   defp process_notification(state, <<@input_event_report, _sub, raw_events::binary>>) do
