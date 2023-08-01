@@ -106,7 +106,7 @@ defmodule InputEvent do
 
   @impl GenServer
   def init(init_args) do
-    executable = :code.priv_dir(:input_event) ++ '/input_event'
+    executable = :code.priv_dir(:input_event) ++ ~c"/input_event"
 
     path = Keyword.fetch!(init_args, :path)
     grab = Keyword.get(init_args, :grab, false)
