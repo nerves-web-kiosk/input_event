@@ -142,6 +142,35 @@ static uint8_t *append_int32(uint8_t *p, int32_t value)
     return p + sizeof(int32_t);
 }
 
+static uint8_t *append_report(uint8_t *p, uint16_t type, uint16_t code, int32_t value)
+{
+    p = append_uint16(p, type);
+    p = append_uint16(p, code);
+    p = append_int32(p, value);
+    return p;
+}
+
+static void send_initial_keypresses(int fd)
+{
+    char key_bitmask[KEY_MAX / 8];
+    if (ioctl(fd, EVIOCGKEY(sizeof(key_bitmask)), key_bitmask) < 0)
+        err(EXIT_FAILURE, "EVIOCGKEY");
+
+    uint8_t *p = report_buffer;
+    for (uint16_t j = 0; j < KEY_MAX; j++) {
+        if (key_bitmask[j / 8] & (1 << (j % 8))) {
+            p = append_report(p, EV_KEY, j, 1); // key_pressed
+        }
+    }
+
+    if (p != report_buffer) {
+        // Terminate with a SYN
+        p = append_report(p, EV_SYN, SYN_REPORT, 0);
+
+        send_report(report_buffer, p - report_buffer, INPUT_EVENT_REPORT, 0);
+    }
+}
+
 static void send_report_info(int fd)
 {
     // Send up information about the reports. Each report info has a "sub"
@@ -208,6 +237,7 @@ int main(int argc, char *argv[])
             errx(EXIT_FAILURE, "Failed to grab device");
 
     send_report(NULL, 0, INPUT_EVENT_READY, 0);
+    send_initial_keypresses(fd);
 
     for (;;) {
         struct pollfd fdset[2];
