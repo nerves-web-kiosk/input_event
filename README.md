@@ -17,7 +17,9 @@ API for receiving events.
 ## Usage
 
 InputEvent can be used to monitor `/dev/input/event*` devices and report decoded
-data to the parent process.
+data to the parent process. The event reports follow the [Linux
+documentation](https://elixir.bootlin.com/linux/latest/source/Documentation/input/event-codes.rst)
+fairly closely, but it's easiest to understand by example.
 
 Start by looking for the device you want to monitor:
 
@@ -182,13 +184,12 @@ messages that you'll be sent. Here are other examples:
 Events from a keyboard look like:
 
 ```elixir
-{:input_event, "/dev/input/event3",
- [{:ev_msc, :msc_scan, 458761}, {:ev_key, :key_f, 1}]}
-{:input_event, "/dev/input/event3",
- [{:ev_msc, :msc_scan, 458761}, {:ev_key, :key_f, 0}]}
+{:input_event, "/dev/input/event3", [{:ev_key, :key_f, 1}]}
+{:input_event, "/dev/input/event3", [{:ev_key, :key_f, 0}]}
 ```
 
-The 1 and 0 indicate key down and key up.
+In the tuple, `{:ev_key, :key_f, 1}`, the third element is `0` for key up, `1`
+for key down, and `2` for key repeat.
 
 ### Mouse
 
