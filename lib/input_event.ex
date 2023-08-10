@@ -51,6 +51,16 @@ defmodule InputEvent do
   """
   @type value() :: integer()
 
+  @typedoc """
+  Event structure
+  """
+  @type event() :: {type(), code(), value()}
+
+  @typedoc """
+  Message that is sent to the caller when input event received
+  """
+  @type events_message() :: {:input_event, String.t(), [event()]}
+
   @input_event_report 1
   @input_event_version 2
   @input_event_name 3

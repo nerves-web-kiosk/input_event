@@ -21,11 +21,12 @@ defmodule InputEvent.Info do
           report_info: [{atom(), [any()]}]
         }
 
+  @type report_info() :: {InputEvent.type(), [InputEvent.code() | {InputEvent.code(), map()}]}
+
   @doc """
   Helper function for decoding raw report information from the port driver.
   """
-  @spec decode_report_info(InputEvent.type_number(), binary()) ::
-          {InputEvent.type(), [InputEvent.code() | {InputEvent.code(), map()}]}
+  @spec decode_report_info(InputEvent.type_number(), binary()) :: report_info()
   def decode_report_info(raw_type, raw_report_info) do
     type = InputEvent.Types.decode_type(raw_type)
 
