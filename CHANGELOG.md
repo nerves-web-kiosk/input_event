@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.3.0
+
+* Changes
+  * On GenServer start, send events for any keys or buttons that are already
+    pressed. This fixes an issue where key presses are missed if the user
+    presses them right before the GenServer starts. GenServer restarts can cause
+    redundant press events now, though.
+
 ## v1.2.0
 
 * Changes
