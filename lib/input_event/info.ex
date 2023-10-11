@@ -34,9 +34,9 @@ defmodule InputEvent.Info do
   end
 
   defp decode_codes(0x03, raw_report_info) do
-    for <<code::native-16, value::signed-native-32, min::signed-native-32, max::signed-native-32,
-          fuzz::signed-native-32, flat::signed-native-32,
-          resolution::signed-native-32 <- raw_report_info>> do
+    for <<code::native-16, value::native-signed-32, min::native-signed-32, max::native-signed-32,
+          fuzz::native-signed-32, flat::native-signed-32,
+          resolution::native-signed-32 <- raw_report_info>> do
       {InputEvent.Types.decode_code(0x03, code),
        %{value: value, min: min, max: max, fuzz: fuzz, flat: flat, resolution: resolution}}
     end

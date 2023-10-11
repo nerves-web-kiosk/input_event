@@ -23,8 +23,7 @@ defmodule InputEvent.Report do
   end
 
   defp decode(
-         <<type::unsigned-native-16, code::unsigned-native-16, value::signed-native-32,
-           rest::binary>>,
+         <<type::native-16, code::native-16, value::native-signed-32, rest::binary>>,
          events,
          all_events
        ) do
