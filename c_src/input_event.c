@@ -72,7 +72,8 @@ static void process_events(int fd)
     if (rd < 0)
         err(EXIT_FAILURE, "read failed");
     if (rd % sizeof(struct input_event))
-        errx(EXIT_FAILURE, "read returned %d which is not a multiple of %d!", (int) rd, (int) sizeof(struct input_event));
+        errx(EXIT_FAILURE, "read returned %d which is not a multiple of %d!", (int) rd,
+             (int) sizeof(struct input_event));
 
     // Package them for processing in Elixir.
     // The event timestamps have platform-dependent sizes (it's a timeval), so
@@ -94,7 +95,7 @@ static void process_events(int fd)
 #define OFF(x)  ((x)%BITS_PER_LONG)
 #define BIT(x)  (1UL<<OFF(x))
 #define LONG(x) ((x)/BITS_PER_LONG)
-#define test_bit(bit, array)	((array[LONG(bit)] >> OFF(bit)) & 1)
+#define test_bit(bit, array)    ((array[LONG(bit)] >> OFF(bit)) & 1)
 
 static void send_version(int fd)
 {
@@ -249,8 +250,7 @@ int main(int argc, char *argv[])
     if (argc > 3 && argc < 5)
         errx(EXIT_FAILURE, "If you define repeat_delay, you must also define repeat_period");
 
-    if (argc == 5)
-    {
+    if (argc == 5) {
         int delay = atoi(argv[3]);
         int period = atoi(argv[4]);
         set_delay_period(fd, delay, period);

@@ -79,7 +79,23 @@ defmodule InputEvent.MixProject do
         Could not format C code since astyle is not available.
         """)
 
-    System.cmd(astyle, ["-n", "-r", "c_src/*.c", "c_src/*.h"], into: IO.stream(:stdio, :line))
+    options = [
+      "-n",
+      "-r",
+      "--style=kr",
+      "--indent=spaces=4",
+      "--align-pointer=name",
+      "--align-reference=name",
+      "--convert-tabs",
+      "--attach-namespaces",
+      "--max-code-length=100",
+      "--max-instatement-indent=120",
+      "--pad-header",
+      "--pad-oper",
+      "c_src/*.c"
+    ]
+
+    System.cmd(astyle, options, into: IO.stream(:stdio, :line))
   end
 
   defp format_c(_args), do: true
