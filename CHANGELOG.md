@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.0
+
+* New features
+  * Add support for setting key repeat delay and period. Thanks @doawoo.
+
 ## v1.3.0
 
 * Changes
