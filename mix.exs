@@ -90,7 +90,7 @@ defmodule InputEvent.MixProject do
       "--convert-tabs",
       "--attach-namespaces",
       "--max-code-length=100",
-      "--max-instatement-indent=120",
+      "--max-continuation-indent=120",
       "--pad-header",
       "--pad-oper",
       "c_src/*.c"
