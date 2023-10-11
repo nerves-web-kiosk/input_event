@@ -85,14 +85,17 @@ defmodule InputEvent do
   Options:
   * `:path` - the path to the input event device (e.g., `"/dev/input/event0"`)
   * `:grab` - set to true to prevent events from being passed to other applications (defaults to `false`)
-  * `:repeat_delay` - delay in milliseconds before a key press repeats.
-  * `:repeat_period` - period in which a key press will repeat.
+  * `:repeat_delay` - delay in milliseconds before a key press repeats
+  * `:repeat_period` - period in milliseconds in which a key press will repeat
   * `:receiver` - the pid or name of the process that receives events (defaults to the process that calls `start_link/1`
 
-  Note that passing the device path rather than a keyword list to `start_link/1` is deprecated.
+  Note that passing the device path rather than a keyword list to
+  `start_link/1` is deprecated.
 
-  Note that you must set BOTH `:repeat_delay` and `:repeat_period` for repeat timing to work properly.
-  Be careful setting repeat timing in multiple places on the same device path! You might override your own settings!
+  When adjusting the key repeat rate, you must set BOTH `:repeat_delay` and
+  `:repeat_period` for `input_event` to make the change. Be careful setting
+  repeat timing in multiple places on the same device path! You might override
+  your own settings!
   """
   @spec start_link(String.t() | options()) :: GenServer.on_start()
   def start_link(path) when is_binary(path) do
@@ -139,7 +142,7 @@ defmodule InputEvent do
     repeat_period = Keyword.get(init_args, :repeat_period)
 
     repeat_args =
-      if is_number(repeat_delay) and is_number(repeat_period) do
+      if is_integer(repeat_delay) and is_integer(repeat_period) do
         [to_string(repeat_delay), to_string(repeat_period)]
       else
         []
