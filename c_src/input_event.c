@@ -217,6 +217,16 @@ static void send_report_info(int fd)
     }
 }
 
+static void set_delay_period(int fd, int delay, int period)
+{
+    int settings[2];
+    settings[0] = delay;
+    settings[1] = period;
+
+    if (ioctl(fd, EVIOCSREP, &settings) < 0)
+        err(EXIT_FAILURE, "EVIOCSREP");
+}
+
 int main(int argc, char *argv[])
 {
     if (argc < 2)
@@ -232,9 +242,19 @@ int main(int argc, char *argv[])
     send_id(fd);
     send_report_info(fd);
 
-    if (argc == 3 && !strcmp(argv[2], "true"))
+    if (argc >= 3 && !strcmp(argv[2], "true"))
         if (ioctl(fd, EVIOCGRAB, (void *)1) != 0)
             errx(EXIT_FAILURE, "Failed to grab device");
+
+    if (argc > 3 && argc < 5)
+        errx(EXIT_FAILURE, "If you define repeat_delay, you must also define repeat_period");
+
+    if (argc == 5)
+    {
+        int delay = atoi(argv[3]);
+        int period = atoi(argv[4]);
+        set_delay_period(fd, delay, period);
+    }
 
     send_report(NULL, 0, INPUT_EVENT_READY, 0);
     send_initial_keypresses(fd);

@@ -71,7 +71,13 @@ defmodule InputEvent do
   @typedoc """
   Options for the InputEvent Genserver
   """
-  @type options() :: [path: String.t(), grab: boolean(), receiver: pid() | atom()]
+  @type options() :: [
+          path: String.t(),
+          grab: boolean(),
+          receiver: pid() | atom(),
+          repeat_delay: pos_integer(),
+          repeat_period: pos_integer()
+        ]
 
   @doc """
   Start a GenServer that reports events from the specified input event device
@@ -79,9 +85,14 @@ defmodule InputEvent do
   Options:
   * `:path` - the path to the input event device (e.g., `"/dev/input/event0"`)
   * `:grab` - set to true to prevent events from being passed to other applications (defaults to `false`)
+  * `:repeat_delay` - delay in milliseconds before a key press repeats.
+  * `:repeat_period` - period in which a key press will repeat.
   * `:receiver` - the pid or name of the process that receives events (defaults to the process that calls `start_link/1`
 
   Note that passing the device path rather than a keyword list to `start_link/1` is deprecated.
+
+  Note that you must set BOTH `:repeat_delay` and `:repeat_period` for repeat timing to work properly.
+  Be careful setting repeat timing in multiple places on the same device path! You might override your own settings!
   """
   @spec start_link(String.t() | options()) :: GenServer.on_start()
   def start_link(path) when is_binary(path) do
@@ -124,9 +135,19 @@ defmodule InputEvent do
     grab = Keyword.get(init_args, :grab, false)
     receiver = Keyword.fetch!(init_args, :receiver)
 
+    repeat_delay = Keyword.get(init_args, :repeat_delay)
+    repeat_period = Keyword.get(init_args, :repeat_period)
+
+    repeat_args =
+      if is_number(repeat_delay) and is_number(repeat_period) do
+        [to_string(repeat_delay), to_string(repeat_period)]
+      else
+        []
+      end
+
     port =
       Port.open({:spawn_executable, executable}, [
-        {:args, [path, grab]},
+        {:args, [path, grab] ++ repeat_args},
         {:packet, 2},
         :use_stdio,
         :binary,
