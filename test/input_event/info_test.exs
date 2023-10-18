@@ -8,6 +8,11 @@ defmodule InputEvent.InfoTest do
              {:ev_key, [:key_1, :key_2]}
   end
 
+  test "decodes rep info" do
+    assert Info.decode_report_info(20, <<238, 2, 0, 0, 144, 1, 0, 0>>) ==
+             {:ev_rep, %{delay: 750, period: 400}}
+  end
+
   test "decodes abs code list" do
     assert Info.decode_report_info(
              3,

@@ -42,6 +42,17 @@ defmodule InputEvent.Info do
     end
   end
 
+  defp decode_codes(0x14, raw_report_info) do
+    case raw_report_info do
+      <<rep_delay::native-32, rep_period::native-32, _::binary>> ->
+        %{delay: rep_delay, period: rep_period}
+
+      _ ->
+        # Not sure.
+        []
+    end
+  end
+
   defp decode_codes(raw_type, raw_report_info) do
     for <<code::native-16 <- raw_report_info>> do
       InputEvent.Types.decode_code(raw_type, code)
