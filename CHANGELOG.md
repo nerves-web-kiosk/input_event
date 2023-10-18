@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.4.1
+
+* Changes
+  * Fix phantom initial keypress events getting reported due to an issue how
+    they were requested from the kernel
+  * Fix lack of initial keypress reporting of high numbered key codes
+  * Fix enumeration info to decode key repeat delay and period properly
+  * Don't send events when enumerating. If a key was pressed when enumerating
+    events, it would be incorrectly sent to the process that called
+    `InputEvent.enumerate/0`.
+
 ## v1.4.0
 
 * New features

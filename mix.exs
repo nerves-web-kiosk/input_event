@@ -1,7 +1,7 @@
 defmodule InputEvent.MixProject do
   use Mix.Project
 
-  @version "1.4.0"
+  @version "1.4.1"
   @source_url "https://github.com/nerves-web-kiosk/input_event"
 
   def project do
