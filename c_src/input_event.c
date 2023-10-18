@@ -153,13 +153,14 @@ static uint8_t *append_report(uint8_t *p, uint16_t type, uint16_t code, int32_t 
 
 static void send_initial_keypresses(int fd)
 {
-    char key_bitmask[KEY_MAX / 8];
-    if (ioctl(fd, EVIOCGKEY(sizeof(key_bitmask)), key_bitmask) < 0)
+    unsigned long bit[NBITS(KEY_MAX)];
+    memset(bit, 0, sizeof(bit));
+    if (ioctl(fd, EVIOCGKEY(KEY_MAX), bit) < 0)
         err(EXIT_FAILURE, "EVIOCGKEY");
 
     uint8_t *p = report_buffer;
     for (uint16_t j = 0; j < KEY_MAX; j++) {
-        if (key_bitmask[j / 8] & (1 << (j % 8))) {
+        if (test_bit(j, bit)) {
             p = append_report(p, EV_KEY, j, 1); // key_pressed
         }
     }
