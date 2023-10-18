@@ -157,7 +157,7 @@ messages that you'll be sent. Here are other examples:
      name: "Logitech K520",
      product: 8209,
      report_info: [
-       ev_rep: [250, :rep_delay, 33, :rep_delay],
+       ev_rep: %{delay: 250, period: 33},
        ev_led: [:led_numl, :led_capsl, :led_scrolll, :led_compose, :led_kana],
        ev_msc: [:msc_scan],
        ev_abs: [
