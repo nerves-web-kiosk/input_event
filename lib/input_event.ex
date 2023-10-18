@@ -195,9 +195,15 @@ defmodule InputEvent do
   end
 
   defp process_notification(state, <<@input_event_report, _sub, raw_events::binary>>) do
-    Enum.each(Report.decode(raw_events), fn events ->
-      send(state.callback, {:input_event, state.path, events})
-    end)
+    callback = state.callback
+
+    if callback do
+      raw_events
+      |> Report.decode()
+      |> Enum.each(fn events ->
+        send(callback, {:input_event, state.path, events})
+      end)
+    end
 
     state
   end
