@@ -19,7 +19,7 @@ defmodule InputEvent.Enumerate do
   end
 
   defp get_info(path) do
-    {:ok, server} = InputEvent.start_link(path)
+    {:ok, server} = InputEvent.start_link(path: path, receiver: nil)
     info = InputEvent.info(server)
     InputEvent.stop(server)
     {path, info}
