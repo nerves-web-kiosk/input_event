@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.2
+
+* Changes
+  * Don't error out when setting the repeat rate fails. This turned out to be
+    hard to debug without console access.
+
 ## v1.4.1
 
 * Changes
