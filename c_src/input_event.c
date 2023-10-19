@@ -226,7 +226,7 @@ static void set_delay_period(int fd, int delay, int period)
     settings[1] = period;
 
     if (ioctl(fd, EVIOCSREP, &settings) < 0)
-        err(EXIT_FAILURE, "EVIOCSREP");
+        warn("EVIOCSREP");
 }
 
 int main(int argc, char *argv[])
