@@ -8,7 +8,7 @@ defmodule InputEvent.MixProject do
     [
       app: :input_event,
       version: @version,
-      elixir: "~> 1.10",
+      elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
