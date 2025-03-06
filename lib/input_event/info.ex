@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2018 Frank Hunleth
+# SPDX-FileCopyrightText: 2023 Jon Carstens
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule InputEvent.Info do
   @moduledoc """
   Information about a input event file

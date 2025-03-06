@@ -60,16 +60,22 @@ defmodule InputEvent.MixProject do
   defp package do
     [
       files: [
+        "CHANGELOG.md",
         "lib",
         "c_src/*.[ch]",
+        "LICENSES/*",
+        "Makefile",
         "mix.exs",
+        "NOTICE",
         "README.md",
-        "LICENSE",
-        "CHANGELOG.md",
-        "Makefile"
+        "REUSE.toml"
       ],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => @source_url}
+      links: %{
+        "GitHub" => @source_url,
+        "REUSE Compliance" =>
+          "https://api.reuse.software/info/github.com/nerves-web-kiosk/input_event"
+      }
     ]
   end
 

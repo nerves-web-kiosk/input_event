@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2016 Justin Schneck
+# SPDX-FileCopyrightText: 2018 Frank Hunleth
+# SPDX-FileCopyrightText: 2020 Connor Rigby
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 # Variables to override
 #
 # CC            C compiler
