@@ -105,15 +105,20 @@ defmodule InputEvent do
   repeat timing in multiple places on the same device path! You might override
   your own settings!
   """
-  @spec start_link(String.t() | options()) :: GenServer.on_start()
+  @spec start_link(String.t() | options()) :: GenServer.on_start() | {:error, :enoent}
   def start_link(path) when is_binary(path) do
     start_link(path: path)
   end
 
   def start_link(options) when is_list(options) do
     options[:path] || raise ArgumentError, "InputEvent requires a input event device path"
-    updated_options = Keyword.put_new(options, :receiver, self())
-    GenServer.start_link(__MODULE__, updated_options)
+
+    if File.exists?(options[:path]) do
+      updated_options = Keyword.put_new(options, :receiver, self())
+      GenServer.start_link(__MODULE__, updated_options)
+    else
+      {:error, :enoent}
+    end
   end
 
   @doc """
